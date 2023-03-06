@@ -4,7 +4,16 @@ from tkinter import messagebox
 
 root = Tk()
 
-root.geometry("1366x768")
+# Tính toán kích thước và vị trí của cửa sổ giữa màn hình
+width = 1366
+height = 768
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x = (screen_width - width) // 2
+y = (screen_height - height) // 2
+
+
+root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 root.title("Login")
 
 user = StringVar()
@@ -28,12 +37,12 @@ def create_emp():
 
     # Thêm dữ liệu vào bảng
     conn.execute(
-        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP001', 'John Doe', '123456789', 'Hcm', '079202021234', 'bcd', 'abc')")
+        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP001', 'John Doe', '123456789', 'Hcm', '079202021234', '12345', 'Employee')")
     conn.execute(
-        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP002', 'q', '123456789', 'Hcm', '079202021234', '12345', 'abc')")
+        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('ADM002', 'Quang', '123456789', 'Hcm', '079202021234', '12345', 'Admin')")
     conn.commit()
     conn.close()
-create_emp()
+
 class login_page:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -86,8 +95,8 @@ def login(Event=None):
     print(results)
     if results:
         messagebox.showinfo("Login Page", "The login is successful")
-        # page1.entry1.delete(0, END)
-        # page1.entry2.delete(0, END)
+        page1.entry1.delete(0, END)
+        page1.entry2.delete(0, END)
         # root.withdraw()
         # global biller
         # global page2
@@ -100,7 +109,7 @@ def login(Event=None):
 
     else:
         messagebox.showerror("Error", "Incorrect username or password.")
-        # page1.entry2.delete(0, END)
+        page1.entry2.delete(0, END)
         print("Thất bại")
 
 page1 = login_page(root)
