@@ -3,7 +3,16 @@ from tkinter import *
 from tkinter import messagebox
 
 main = Tk()
-main.geometry("1366x768")
+# Tính toán kích thước và vị trí của cửa sổ giữa màn hình
+width = 1366
+height = 768
+screen_width = main.winfo_screenwidth()
+screen_height = main.winfo_screenheight()
+x = (screen_width - width) // 2
+y = (screen_height - height) // 2
+
+
+main.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 main.title("Ứng dụng quản lý bán hàng")
 main.resizable(0, 0)
 
@@ -25,7 +34,7 @@ def emp():
 
 def adm():
     main.withdraw()
-    os.system("python admin.py")
+    os.system("python ./Admin/Login.py")
     main.deiconify()
 
 
