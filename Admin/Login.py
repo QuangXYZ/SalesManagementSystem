@@ -1,7 +1,7 @@
 import sqlite3
 from tkinter import *
 from tkinter import messagebox
-
+import os
 root = Tk()
 # Tính toán kích thước và vị trí của cửa sổ giữa màn hình
 width = 1366
@@ -68,14 +68,11 @@ class login_page:
                 page1.entry1.delete(0, END)
                 page1.entry2.delete(0, END)
 
-                # root.withdraw()
-                # global adm
-                # global page2
-                # adm = Toplevel()
-                # page2 = Admin_Page(adm)
-                # page2.time()
-                # adm.protocol("WM_DELETE_WINDOW", exit)
-                # adm.mainloop()
+                root.withdraw()
+                os.system("python ./Admin/menuAdmin.py")
+                root.deiconify()
+
+
             else:
                 messagebox.showerror("Oops!!", "You are not an admin.")
 
@@ -87,7 +84,6 @@ class login_page:
 def exit():
     sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không?", parent=root)
     if sure == True:
-        # adm.destroy()
         root.destroy()
 
 
