@@ -25,12 +25,14 @@ class login_page:
         self.label1 = Label(root)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
         self.img = PhotoImage(file="./Images/admin_login.png")
+        self.img = PhotoImage(file="./Images/admin_login.png")
         self.label1.configure(image=self.img)
 
         self.entry1 = Entry(root)
         self.entry1.place(relx=0.373, rely=0.273, width=374, height=24)
         self.entry1.configure(font="-family {Poppins} -size 10")
         self.entry1.configure(relief="flat")
+        self.entry1.focus()
         self.entry1.configure(textvariable=user)
 
         self.entry2 = Entry(root)
@@ -88,4 +90,5 @@ def exit():
 
 
 page1 = login_page(root)
+root.bind("<Return>", login_page.login)
 root.mainloop()

@@ -1,7 +1,7 @@
+import os
 import sqlite3
 from tkinter import *
 from tkinter import messagebox
-
 
 root = Tk()
 width = 1366
@@ -12,6 +12,8 @@ x = (screen_width - width) // 2
 y = (screen_height - height) // 2
 root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 root.title("Retail Manager(ADMIN)")
+
+
 class Admin_Page:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -55,7 +57,7 @@ class Admin_Page:
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""Inventory""")
-       # self.button2.configure(command=inventory)
+        self.button2.configure(command=self.Inventory)
 
         self.button3 = Button(root)
         self.button3.place(relx=0.338, rely=0.508, width=146, height=63)
@@ -68,8 +70,7 @@ class Admin_Page:
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
         self.button3.configure(text="""Employees""")
-     #   self.button3.configure(command=employee)
-
+        self.button3.configure(command=self.Employee)
 
         self.button4 = Button(root)
         self.button4.place(relx=0.536, rely=0.508, width=146, height=63)
@@ -82,8 +83,7 @@ class Admin_Page:
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
         self.button4.configure(text="""Invoices""")
-     #   self.button4.configure(command=invoices)
-
+        self.button4.configure(command=self.Invoices)
 
         self.button5 = Button(root)
         self.button5.place(relx=0.732, rely=0.508, width=146, height=63)
@@ -96,11 +96,33 @@ class Admin_Page:
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
         self.button5.configure(text="""About Us""")
-       # self.button5.configure(command=Customer)
+        self.button5.configure(command=self.Customer)
 
     def Logout(self):
         sure = messagebox.askyesno("Logout", "Are you sure you want to logout?", parent=root)
         if sure == True:
             root.destroy()
+
+    def Inventory(self):
+        root.withdraw()
+        os.system("python ./Admin/Inventory.py")
+        root.deiconify()
+
+    def Invoices(self):
+        root.withdraw()
+        os.system("python ./Admin/Invoices.py")
+        root.deiconify()
+
+    def Employee(self):
+        root.withdraw()
+        os.system("python ./Admin/Employees.py")
+        root.deiconify()
+
+    def Customer(self):
+        root.withdraw()
+        os.system("python ./Admin/Customers.py")
+        root.deiconify()
+
+
 page1 = Admin_Page(root)
 root.mainloop()
