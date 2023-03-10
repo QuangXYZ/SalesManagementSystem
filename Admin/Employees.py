@@ -1,7 +1,11 @@
 import sqlite3
+from time import strftime
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import re
+import string
+import random
 
 
 root = Tk()
@@ -16,6 +20,42 @@ root.title("Retail Manager(ADMIN)")
 
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
+
+def random_emp_id(stringLength):
+    Digits = string.digits
+    strr=''.join(random.choice(Digits) for i in range(stringLength-3))
+    return ('EMP'+strr)
+
+def valid_phone(phn):
+    if re.match(r"[0]\d{9}$", phn):#[0]: bắt đầu bằng số 0, \d: đại diện ký tự từ 0-9, {9}: bắt buộc có 9 ký tự
+        return True
+    return False
+
+def valid_identification(aad):
+    if aad.isdigit() and len(aad)==12:
+        return True
+    return False
+
+def checkData(name, contact, identification, designation, address, password):
+    if not name:
+        messagebox.showerror("Lỗi!", "Vui lòng nhập tên.", parent=e_add)
+        return False
+    if valid_phone(contact) is False:
+        messagebox.showerror("Lỗi!", "Số điện thoại không hợp lệ.", parent=e_add)
+        return False
+    if valid_identification(identification) is False:
+        messagebox.showerror("Lỗi!", "Số căn cước không hợp lệ.", parent=e_add)
+        return False
+    if not designation:
+        messagebox.showerror("Lỗi!", "Vui lòng nhập quyền.", parent=e_add)
+        return False
+    if not address:
+        messagebox.showerror("Lỗi!", "Vui lòng nhập địa chỉ.", parent=e_add)
+        return False
+    if not password:
+        messagebox.showerror("Lỗi!", "Vui lòng nhập password.", parent=e_add)
+        return False
+    return True
 
 class Employee:
     def __init__(self, top=None):
@@ -165,11 +205,18 @@ class Employee:
         self.tree.column("#6", stretch=NO, minwidth=0, width=80)
         self.tree.column("#7", stretch=NO, minwidth=0, width=80)
 
+        self.DisplayData()
+
+    def DisplayData(self):
+        cur.execute("SELECT * FROM employee")
+        fetch = cur.fetchall()
+        for data in fetch:
+            self.tree.insert("", "end", values=(data))
+
     def add_emp(self):
         global e_add
         e_add = Toplevel()
         page6 = add_employee(e_add)
-        page6.time()
         e_add.protocol("WM_DELETE_WINDOW", self.ex)
         e_add.mainloop()
 
@@ -245,7 +292,7 @@ class add_employee:
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""ADD""")
-        #self.button1.configure(command=self.add)
+        self.button1.configure(command=self.add)
 
         self.button2 = Button(e_add)
         self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
@@ -260,7 +307,30 @@ class add_employee:
         self.button2.configure(text="""CLEAR""")
         #self.button2.configure(command=self.clearr)
 
+    def time(self):
+        string = strftime("%H:%M:%S %p")
+        self.clock.config(text=string)
+        self.clock.after(1000, self.time)
 
+    def add(self):
+        ename = self.entry1.get()
+        econtact = self.entry2.get()
+        eidentification = self.entry3.get()
+        edes = self.entry4.get()
+        eadd = self.entry5.get()
+        epass = self.entry6.get()
+        #def checkData(self, name, contact, identification, designation, address, password):
+        if checkData(ename, econtact, eidentification, edes, eadd, epass):
+            emp_id = random_emp_id(7)
+            insert = (
+                "INSERT INTO employee(emp_id, name, contact_num, address, cccd, password, designation) VALUES(?,?,?,?,?,?,?)"
+            )
+            cur.execute(insert, [emp_id, ename, econtact, eadd, eidentification, epass, edes])
+            db.commit()
+            messagebox.showinfo("Success!!", "Employee ID: {} successfully added in database.".format(emp_id),parent=e_add)
+            self.clearr()
+        else:
+            messagebox.showinfo("Lỗi!!", "Xảy ra lỗi.",parent=e_add)
 
     def testint(self, val):
         if val.isdigit():
