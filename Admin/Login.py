@@ -2,6 +2,7 @@ import sqlite3
 from tkinter import *
 from tkinter import messagebox
 import os
+import tkinter as tk
 root = Tk()
 # Tính toán kích thước và vị trí của cửa sổ giữa màn hình
 width = 1366
@@ -34,6 +35,9 @@ class login_page:
         self.entry1.configure(relief="flat")
         self.entry1.focus()
         self.entry1.configure(textvariable=user)
+        new_text = "ADM002"
+        self.entry1.delete(0, tk.END)
+        self.entry1.insert(0, new_text)
 
         self.entry2 = Entry(root)
         self.entry2.place(relx=0.373, rely=0.384, width=374, height=24)
@@ -41,6 +45,10 @@ class login_page:
         self.entry2.configure(relief="flat")
         self.entry2.configure(show="*")
         self.entry2.configure(textvariable=passwd)
+        new_text = "12345"
+        self.entry2.delete(0, tk.END)
+        self.entry2.insert(0, new_text)
+
 
         self.button1 = Button(root)
         self.button1.place(relx=0.366, rely=0.685, width=356, height=43)
