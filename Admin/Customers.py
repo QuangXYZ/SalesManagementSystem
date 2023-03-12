@@ -1,4 +1,8 @@
+import os
+import random
+import re
 import sqlite3
+import string
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -12,7 +16,6 @@ screen_height = root.winfo_screenheight()
 x = (screen_width - width) // 2
 y = (screen_height - height) // 2
 root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
-root.title("Retail Manager(ADMIN)")
 
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
@@ -20,8 +23,7 @@ class Employee:
     def __init__(self, top=None):
         top.geometry("1366x768")
         top.resizable(0, 0)
-        top.title("Employee Management")
-
+        top.title("Quản lý khách hàng")
         self.label1 = Label(root)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
         self.img = PhotoImage(file="./Images/employee.png")
@@ -56,8 +58,8 @@ class Employee:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""Search""")
-        # self.button1.configure(command=self.search_emp)
+        self.button1.configure(text="""Tìm""")
+        self.button1.configure(command=self.search_emp)
 
         self.button2 = Button(root)
         self.button2.place(relx=0.035, rely=0.106, width=76, height=23)
@@ -70,7 +72,7 @@ class Employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""Logout""")
-        # self.button2.configure(command=self.Logout)
+        self.button2.configure(command=self.Logout)
 
         self.button3 = Button(root)
         self.button3.place(relx=0.052, rely=0.432, width=306, height=28)
@@ -82,8 +84,8 @@ class Employee:
         self.button3.configure(background="#CF1E14")
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
-        self.button3.configure(text="""ADD EMPLOYEE""")
-        # self.button3.configure(command=self.add_emp)
+        self.button3.configure(text="""Thêm Khách hàng""")
+        self.button3.configure(command=self.add_emp)
 
         self.button4 = Button(root)
         self.button4.place(relx=0.052, rely=0.5, width=306, height=28)
@@ -95,8 +97,8 @@ class Employee:
         self.button4.configure(background="#CF1E14")
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
-        self.button4.configure(text="""UPDATE EMPLOYEE""")
-        # self.button4.configure(command=self.update_emp)
+        self.button4.configure(text="""Cập nhật thông tin""")
+        self.button4.configure(command=self.update_emp)
 
         self.button5 = Button(root)
         self.button5.place(relx=0.052, rely=0.57, width=306, height=28)
@@ -108,8 +110,8 @@ class Employee:
         self.button5.configure(background="#CF1E14")
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
-        self.button5.configure(text="""DELETE EMPLOYEE""")
-        # self.button5.configure(command=self.delete_emp)
+        self.button5.configure(text="""Xóa khách hàng""")
+        self.button5.configure(command=self.delete_emp)
 
         self.button6 = Button(root)
         self.button6.place(relx=0.135, rely=0.885, width=76, height=23)
@@ -121,8 +123,8 @@ class Employee:
         self.button6.configure(background="#CF1E14")
         self.button6.configure(font="-family {Poppins SemiBold} -size 12")
         self.button6.configure(borderwidth="0")
-        self.button6.configure(text="""EXIT""")
-        # self.button6.configure(command=self.Exit)
+        self.button6.configure(text="""Thoát""")
+        self.button6.configure(command=self.Exit)
 
         self.scrollbarx = Scrollbar(root, orient=HORIZONTAL)
         self.scrollbary = Scrollbar(root, orient=VERTICAL)
@@ -133,7 +135,7 @@ class Employee:
         )
         self.tree.configure(selectmode="extended")
 
-        # self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
+        self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
         self.scrollbary.configure(command=self.tree.yview)
         self.scrollbarx.configure(command=self.tree.xview)
@@ -172,13 +174,424 @@ class Employee:
 
         self.DisplayData()
 
-
+    sel = []
     def DisplayData(self):
         cur.execute("SELECT * FROM employee")
         fetch = cur.fetchall()
         for data in fetch:
             self.tree.insert("", "end", values=(data))
+    def on_tree_select(self, Event):
+        self.sel.clear()
+        for i in self.tree.selection():
+            if i not in self.sel:
+                self.sel.append(i)
+    def Exit(self):
+        sure = messagebox.askyesno("Exit","Are you sure you want to exit?", parent=root)
+        if sure == True:
+            root.destroy()
+    def add_emp(self):
+        global e_add
+        e_add = Toplevel()
+        page2 = add_employee(e_add)
+        # page2.time()
+        e_add.protocol("WM_DELETE_WINDOW", self.ex)
+        e_add.mainloop()
 
+    def search_emp(self):
+        val = []
+        for i in self.tree.get_children():
+            val.append(i)
+            for j in self.tree.item(i)["values"]:
+                val.append(j)
+
+        to_search = self.entry1.get()
+        for search in val:
+            if search == to_search:
+                self.tree.selection_set(val[val.index(search) - 1])
+                self.tree.focus(val[val.index(search) - 1])
+                messagebox.showinfo("Success!!", "Customer ID: {} found.".format(self.entry1.get()), parent=root)
+                break
+        else:
+            messagebox.showerror("Oops!!", "Customer ID: {} not found.".format(self.entry1.get()), parent=root)
+
+
+    def ex(self):  # thoát screen thêm kh
+        e_add.destroy()
+        self.tree.delete(*self.tree.get_children())
+        self.DisplayData()
+
+    def Logout(self):
+        sure = messagebox.askyesno("Logout", "Bạn có muốn đăng xuất?")
+        if sure == True:
+            root.destroy()
+            os.system("python ./Admin/Login.py")
+
+    def update_emp(self):
+
+        if len(self.sel) == 1:
+            global e_update
+            e_update = Toplevel()
+            page3 = Update_Employee(e_update)
+            # page3.time()
+            e_update.protocol("WM_DELETE_WINDOW", self.exUpdate)
+            global vall
+            vall = []
+            for i in self.sel:
+                for j in self.tree.item(i)["values"]:
+                    vall.append(j)
+
+            page3.entry1.insert(0, vall[1])
+            page3.entry2.insert(0, vall[2])
+            page3.entry3.insert(0, vall[4])
+            page3.entry4.insert(0, vall[6])
+            page3.entry5.insert(0, vall[3])
+            page3.entry6.insert(0, vall[5])
+            e_update.mainloop()
+        elif len(self.sel) == 0:
+            messagebox.showerror("Error", "Hãy chọn khách hàng cần cập nhất.")
+        else:
+            messagebox.showerror("Error", "Chỉ có thể cập nhật 1 khách hàng mỗi lần .")
+
+    def exUpdate(self):
+        sure = messagebox.askyesno("Exit","Bạn có muốn thoát không?", parent=e_update)
+        if sure == True:
+            e_update.destroy()
+
+    def delete_emp(self):
+        val = []
+        to_delete = []
+
+        if len(self.sel) != 0:
+            sure = messagebox.askyesno("Confirm", "Bạn có chắc muốn xóa (những) khách hàng này không?", parent=root)
+            if sure == True:
+                for i in self.sel:
+                    for j in self.tree.item(i)["values"]:
+                        val.append(j)
+
+                for j in range(len(val)):
+                    if j % 7 == 0:
+                        to_delete.append(val[j])
+
+                flag = 1
+
+                for k in to_delete:
+                    if k == "EMP0000":
+                        flag = 0
+                        break
+                    else:
+                        delete = "DELETE FROM employee WHERE emp_id = ?"
+                        cur.execute(delete, [k])
+                        db.commit()
+
+                if flag == 1:
+                    messagebox.showinfo("Success!!", "Employee(s) deleted from database.", parent=root)
+                    self.sel.clear()
+                    self.tree.delete(*self.tree.get_children())
+                    self.DisplayData()
+                else:
+                    messagebox.showerror("Error!!", "Cannot delete master admin.")
+        else:
+            messagebox.showerror("Error!!", "Please select an employee.", parent=root)
+
+
+# màn hình thêm kh
+class add_employee:
+    def __init__(self, top=None):
+        top.geometry("1366x768")
+        top.resizable(0, 0)
+        top.title("Thêm khách hàng")
+
+        self.label1 = Label(e_add)
+        self.label1.place(relx=0, rely=0, width=1366, height=768)
+        self.img = PhotoImage(file="./Images/add_employee.png")
+        self.label1.configure(image=self.img)
+
+        self.clock = Label(e_add)
+        self.clock.place(relx=0.84, rely=0.065, width=102, height=36)
+        self.clock.configure(font="-family {Poppins Light} -size 12")
+        self.clock.configure(foreground="#000000")
+        self.clock.configure(background="#ffffff")
+
+        self.r1 = e_add.register(self.testint)
+        self.r2 = e_add.register(self.testchar)
+
+        self.entry1 = Entry(e_add)
+        self.entry1.place(relx=0.132, rely=0.296, width=374, height=30)
+        self.entry1.configure(font="-family {Poppins} -size 12")
+        self.entry1.configure(relief="flat")
+
+        self.entry2 = Entry(e_add)
+        self.entry2.place(relx=0.132, rely=0.413, width=374, height=30)
+        self.entry2.configure(font="-family {Poppins} -size 12")
+        self.entry2.configure(relief="flat")
+        self.entry2.configure(validate="key", validatecommand=(self.r1, "%P"))
+
+        self.entry3 = Entry(e_add)
+        self.entry3.place(relx=0.132, rely=0.529, width=374, height=30)
+        self.entry3.configure(font="-family {Poppins} -size 12")
+        self.entry3.configure(relief="flat")
+        self.entry3.configure(validate="key", validatecommand=(self.r1, "%P"))
+
+        self.entry4 = Entry(e_add)
+        self.entry4.place(relx=0.527, rely=0.296, width=374, height=30)
+        self.entry4.configure(font="-family {Poppins} -size 12")
+        self.entry4.configure(relief="flat")
+        self.entry4.configure(validate="key", validatecommand=(self.r2, "%P"))
+
+        self.entry5 = Entry(e_add)
+        self.entry5.place(relx=0.527, rely=0.413, width=374, height=30)
+        self.entry5.configure(font="-family {Poppins} -size 12")
+        self.entry5.configure(relief="flat")
+
+        self.entry6 = Entry(e_add)
+        self.entry6.place(relx=0.527, rely=0.529, width=374, height=30)
+        self.entry6.configure(font="-family {Poppins} -size 12")
+        self.entry6.configure(relief="flat")
+        self.entry6.configure(show="*")
+
+        self.button1 = Button(e_add)
+        self.button1.place(relx=0.408, rely=0.836, width=96, height=34)
+        self.button1.configure(relief="flat")
+        self.button1.configure(overrelief="flat")
+        self.button1.configure(activebackground="#CF1E14")
+        self.button1.configure(cursor="hand2")
+        self.button1.configure(foreground="#ffffff")
+        self.button1.configure(background="#CF1E14")
+        self.button1.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button1.configure(borderwidth="0")
+        self.button1.configure(text="""ADD""")
+        self.button1.configure(command=self.addCustomer)
+
+        self.button2 = Button(e_add)
+        self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
+        self.button2.configure(relief="flat")
+        self.button2.configure(overrelief="flat")
+        self.button2.configure(activebackground="#CF1E14")
+        self.button2.configure(cursor="hand2")
+        self.button2.configure(foreground="#ffffff")
+        self.button2.configure(background="#CF1E14")
+        self.button2.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button2.configure(borderwidth="0")
+        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(command=self.clearForm)
+
+
+    def clearForm(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry5.delete(0, END)
+        self.entry6.delete(0, END)
+
+    def addCustomer(self):
+        ename = self.entry1.get()
+        econtact = self.entry2.get()
+        eaddhar = self.entry3.get()
+        edes = self.entry4.get()
+        eadd = self.entry5.get()
+        epass = self.entry6.get()
+
+        if ename.strip():
+            if valid_phone(econtact):
+                if valid_cccd(eaddhar):
+                    if edes:
+                        if eadd:
+                            if epass:
+                                emp_id = random_emp_id(7)
+                                insert = (
+                                            "INSERT INTO employee(emp_id, name, contact_num, address, cccd, password, designation) VALUES(?,?,?,?,?,?,?)"
+                                        )
+                                cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
+                                db.commit()
+                                messagebox.showinfo("Success!!", "Employee ID: {} successfully added in database.".format(emp_id), parent=e_add)
+                                self.clearr()
+                            else:
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
+                        else:
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
+                    else:
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
+                else:
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
+            else:
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
+        else:
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
+
+    def testint(self, val):
+        if val.isdigit():
+            return True
+        elif val == "":
+            return True
+        return False
+
+    def testchar(self, val):
+        if val.isalpha():
+            return True
+        elif val == "":
+            return True
+        return False
+
+# màn hình update khách hàng
+class Update_Employee:
+    def __init__(self, top=None):
+        top.geometry("1366x768")
+        top.resizable(0, 0)
+        top.title("Update Employee")
+
+        self.label1 = Label(e_update)
+        self.label1.place(relx=0, rely=0, width=1366, height=768)
+        self.img = PhotoImage(file="./images/update_employee.png")
+        self.label1.configure(image=self.img)
+
+        self.clock = Label(e_update)
+        self.clock.place(relx=0.84, rely=0.065, width=102, height=36)
+        self.clock.configure(font="-family {Poppins Light} -size 12")
+        self.clock.configure(foreground="#000000")
+        self.clock.configure(background="#ffffff")
+
+        self.r1 = e_update.register(self.testint)
+        self.r2 = e_update.register(self.testchar)
+
+        self.entry1 = Entry(e_update)
+        self.entry1.place(relx=0.132, rely=0.296, width=374, height=30)
+        self.entry1.configure(font="-family {Poppins} -size 12")
+        self.entry1.configure(relief="flat")
+
+        self.entry2 = Entry(e_update)
+        self.entry2.place(relx=0.132, rely=0.413, width=374, height=30)
+        self.entry2.configure(font="-family {Poppins} -size 12")
+        self.entry2.configure(relief="flat")
+        self.entry2.configure(validate="key", validatecommand=(self.r1, "%P"))
+
+        self.entry3 = Entry(e_update)
+        self.entry3.place(relx=0.132, rely=0.529, width=374, height=30)
+        self.entry3.configure(font="-family {Poppins} -size 12")
+        self.entry3.configure(relief="flat")
+        self.entry3.configure(validate="key", validatecommand=(self.r1, "%P"))
+
+        self.entry4 = Entry(e_update)
+        self.entry4.place(relx=0.527, rely=0.296, width=374, height=30)
+        self.entry4.configure(font="-family {Poppins} -size 12")
+        self.entry4.configure(relief="flat")
+        self.entry4.configure(validate="key", validatecommand=(self.r2, "%P"))
+
+        self.entry5 = Entry(e_update)
+        self.entry5.place(relx=0.527, rely=0.413, width=374, height=30)
+        self.entry5.configure(font="-family {Poppins} -size 12")
+        self.entry5.configure(relief="flat")
+
+        self.entry6 = Entry(e_update)
+        self.entry6.place(relx=0.527, rely=0.529, width=374, height=30)
+        self.entry6.configure(font="-family {Poppins} -size 12")
+        self.entry6.configure(relief="flat")
+        self.entry6.configure(show="*")
+
+        self.button1 = Button(e_update)
+        self.button1.place(relx=0.408, rely=0.836, width=96, height=34)
+        self.button1.configure(relief="flat")
+        self.button1.configure(overrelief="flat")
+        self.button1.configure(activebackground="#CF1E14")
+        self.button1.configure(cursor="hand2")
+        self.button1.configure(foreground="#ffffff")
+        self.button1.configure(background="#CF1E14")
+        self.button1.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button1.configure(borderwidth="0")
+        self.button1.configure(text="""UPDATE""")
+        self.button1.configure(command=self.update)
+
+        self.button2 = Button(e_update)
+        self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
+        self.button2.configure(relief="flat")
+        self.button2.configure(overrelief="flat")
+        self.button2.configure(activebackground="#CF1E14")
+        self.button2.configure(cursor="hand2")
+        self.button2.configure(foreground="#ffffff")
+        self.button2.configure(background="#CF1E14")
+        self.button2.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button2.configure(borderwidth="0")
+        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(command=self.clearr)
+
+    def update(self):
+        ename = self.entry1.get()
+        econtact = self.entry2.get()
+        eaddhar = self.entry3.get()
+        edes = self.entry4.get()
+        eadd = self.entry5.get()
+        epass = self.entry6.get()
+
+        if ename.strip():
+            if valid_phone(econtact):
+                if valid_cccd(eaddhar):
+                    if edes:
+                        if eadd:
+                            if epass:
+                                emp_id = vall[0]
+                                update = (
+                                    "UPDATE employee SET name = ?, contact_num = ?, address = ?, aadhar_num = ?, password = ?, designation = ? WHERE emp_id = ?"
+                                )
+                                cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
+                                db.commit()
+                                messagebox.showinfo("Success!!",
+                                                    "Employee ID: {} successfully updated in database.".format(emp_id),
+                                                    parent=e_update)
+                                vall.clear()
+                                page1.tree.delete(*page1.tree.get_children())
+                                page1.DisplayData()
+                                Employee.sel.clear()
+                                e_update.destroy()
+                            else:
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
+                        else:
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
+                    else:
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
+                else:
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
+            else:
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
+        else:
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
+
+    def clearr(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry5.delete(0, END)
+        self.entry6.delete(0, END)
+
+    def testint(self, val):
+        if val.isdigit():
+            return True
+        elif val == "":
+            return True
+        return False
+
+    def testchar(self, val):
+        if val.isalpha():
+            return True
+        elif val == "":
+            return True
+        return False
+
+
+
+def valid_phone(phn):
+    if re.match(r"[789]\d{9}$", phn):
+        return True
+    return False
+
+def valid_cccd(aad):
+    if aad.isdigit() and len(aad)==12:
+        return True
+    return False
+def random_emp_id(stringLength):
+    Digits = string.digits
+    strr=''.join(random.choice(Digits) for i in range(stringLength-3))
+    return ('EMP'+strr)
 
 page1 = Employee(root)
 root.mainloop()
