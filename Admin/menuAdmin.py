@@ -95,7 +95,7 @@ class Admin_Page:
         self.button5.configure(background="#ffffff")
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
-        self.button5.configure(text="""About Us""")
+        self.button5.configure(text="""Customers""")
         self.button5.configure(command=self.Customer)
 
     def Logout(self):

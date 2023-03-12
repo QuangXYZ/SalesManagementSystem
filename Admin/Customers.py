@@ -24,7 +24,7 @@ class Employee:
 
         self.label1 = Label(root)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./images/employee.png")
+        self.img = PhotoImage(file="./Images/employee.png")
         self.label1.configure(image=self.img)
 
         self.message = Label(root)
@@ -157,7 +157,7 @@ class Employee:
         self.tree.heading("Employee Name", text="Employee Name", anchor=W)
         self.tree.heading("Contact No.", text="Contact No.", anchor=W)
         self.tree.heading("Address", text="Address", anchor=W)
-        self.tree.heading("cccd", text="Aadhar No.", anchor=W)
+        self.tree.heading("cccd", text="CCCD No.", anchor=W)
         self.tree.heading("Password", text="Password", anchor=W)
         self.tree.heading("Designation", text="Designation", anchor=W)
 

@@ -33,7 +33,7 @@ def create_emp():
         "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP002', 'q', '123456789', 'Hcm', '079202021234', '12345', 'abc')")
     conn.commit()
     conn.close()
-create_emp()
+
 class login_page:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -104,4 +104,5 @@ def login(Event=None):
         print("Thất bại")
 
 page1 = login_page(root)
+root.bind("<Return>",login)
 root.mainloop()

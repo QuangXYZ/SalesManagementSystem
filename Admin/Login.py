@@ -91,10 +91,10 @@ class login_page:
             page1.entry2.delete(0, END)
 
 
-def exit():
-    sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không?", parent=root)
-    if sure == True:
-        root.destroy()
+    def exit(self):
+        sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không?", parent=root)
+        if sure == True:
+            root.destroy()
 
 
 page1 = login_page(root)
