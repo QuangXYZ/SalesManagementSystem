@@ -92,7 +92,7 @@ class Employee:
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""Search""")
-        #self.button1.configure(command=self.search_emp)
+        self.button1.configure(command=self.search_emp)
 
         self.button2 = Button(root)
         self.button2.place(relx=0.035, rely=0.106, width=76, height=23)
@@ -144,7 +144,7 @@ class Employee:
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
         self.button5.configure(text="""DELETE EMPLOYEE""")
-        #self.button5.configure(command=self.delete_emp)
+        self.button5.configure(command=self.delete_emp)
 
         self.button6 = Button(root)
         self.button6.place(relx=0.135, rely=0.885, width=76, height=23)
@@ -262,6 +262,59 @@ class Employee:
         else:
             messagebox.showerror("Error", "Chỉ có thể chọn 1 nhân viên để chỉnh sửa.")
 
+    def delete_emp(self):
+        val = []
+        to_delete = []
+
+        if len(self.sel) != 0:
+            sure = messagebox.askyesno("Confirm", "Bạn có chắc chắn muốn xóa các nhân viên?")
+            if sure == True:
+                for i in self.sel:
+                    for j in self.tree.item(i)["values"]:
+                        val.append(j)
+
+                for j in range(len(val)):
+                    if j % 7 == 0:
+                        to_delete.append(val[j])
+
+                flag = 1
+
+                for k in to_delete:
+                    if k == "ADM002":
+                        flag = 0
+                        break
+                    else:
+                        delete = "DELETE FROM employee WHERE emp_id = ?"
+                        cur.execute(delete, [k])
+                        db.commit()
+
+                if flag == 1:
+                    messagebox.showinfo("Success!!", "Nhân viên đã xóa khỏi cơ sở dữ liệu.")
+                    self.sel.clear()
+                    self.tree.delete(*self.tree.get_children())
+                    self.DisplayData()
+                else:
+                    messagebox.showerror("Error!!", "Không thể xóa quản trị viên.")
+        else:
+            messagebox.showerror("Error!!", "Vui lòng chọn nhân viên.")
+
+    def search_emp(self):
+        val = []
+        for i in self.tree.get_children():
+            val.append(i)
+            for j in self.tree.item(i)["values"]:
+                val.append(j)
+
+        to_search = self.entry1.get()
+        for search in val:
+            if search==to_search:
+                self.tree.selection_set(val[val.index(search)-1])
+                self.tree.focus(val[val.index(search)-1])
+                messagebox.showinfo("Success!!", "Employee ID: {} tìm thấy.".format(self.entry1.get()))
+                break
+        else:
+            messagebox.showerror("Oops!!", "Employee ID: {} không tìm thấy.".format(self.entry1.get()))
+
 class add_employee:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -357,7 +410,7 @@ class add_employee:
         eadd = self.entry5.get()
         epass = self.entry6.get()
         #def checkData(self, name, contact, identification, designation, address, password):
-        if checkData(ename, econtact, eidentification, edes, eadd, epass):
+        if checkData(e_add, ename, econtact, eidentification, edes, eadd, epass):
             emp_id = random_emp_id(7)
             insert = (
                 "INSERT INTO employee(emp_id, name, contact_num, address, cccd, password, designation) VALUES(?,?,?,?,?,?,?)"
