@@ -36,7 +36,7 @@ def valid_identification(aad):
         return True
     return False
 
-def checkData(name, contact, identification, designation, address, password):
+def checkData(e_add, name, contact, identification, designation, address, password):
     if not name:
         messagebox.showerror("Lỗi!", "Vui lòng nhập tên.", parent=e_add)
         return False
@@ -168,7 +168,7 @@ class Employee:
         )
         self.tree.configure(selectmode="extended")
 
-        #self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
+        self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
         self.scrollbary.configure(command=self.tree.yview)
         self.scrollbarx.configure(command=self.tree.xview)
@@ -225,13 +225,42 @@ class Employee:
         self.tree.delete(*self.tree.get_children())
         self.DisplayData()
 
+    def ex2(self):
+        e_update.destroy()
+        self.tree.delete(*self.tree.get_children())
+        self.DisplayData()
+
     sel = []
+    def on_tree_select(self, Event):
+        self.sel.clear()
+        for i in self.tree.selection():
+            if i not in self.sel:
+                self.sel.append(i)
+
     def update_emp(self):
+
+        if len(self.sel) == 1:
             global e_update
             e_update = Toplevel()
-            page8 = Update_Employee(e_update)
+            page3 = Update_Employee(e_update)
             e_update.protocol("WM_DELETE_WINDOW", self.ex2)
-            e_add.mainloop()
+            global vall
+            vall = []
+            for i in self.sel:
+                for j in self.tree.item(i)["values"]:
+                    vall.append(j)
+
+            page3.entry1.insert(0, vall[1])
+            page3.entry2.insert(0, vall[2])
+            page3.entry3.insert(0, vall[4])
+            page3.entry4.insert(0, vall[6])
+            page3.entry5.insert(0, vall[3])
+            page3.entry6.insert(0, vall[5])
+            e_update.mainloop()
+        elif len(self.sel) == 0:
+            messagebox.showerror("Error", "Vui lòng chọn nhân viên để chình sửa.")
+        else:
+            messagebox.showerror("Error", "Chỉ có thể chọn 1 nhân viên để chỉnh sửa.")
 
 class add_employee:
     def __init__(self, top=None):
@@ -305,7 +334,15 @@ class add_employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
-        #self.button2.configure(command=self.clearr)
+        self.button2.configure(command=self.clearr)
+
+    def clearr(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry5.delete(0, END)
+        self.entry6.delete(0, END)
 
     def time(self):
         string = strftime("%H:%M:%S %p")
@@ -406,7 +443,7 @@ class Update_Employee:
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""UPDATE""")
-        # self.button1.configure(command=self.update)
+        self.button1.configure(command=self.update)
 
         self.button2 = Button(e_update)
         self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
@@ -419,7 +456,32 @@ class Update_Employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
-        # self.button2.configure(command=self.clearr)
+        self.button2.configure(command=self.clearr)
+
+    def update(self):
+        ename = self.entry1.get()
+        econtact = self.entry2.get()
+        eidentification = self.entry3.get()
+        edes = self.entry4.get()
+        eadd = self.entry5.get()
+        epass = self.entry6.get()
+        #def checkData(self, name, contact, identification, designation, address, password):
+        if checkData(e_update, ename, econtact, eidentification, edes, eadd, epass):
+            emp_id = vall[0]
+            update = (
+                "UPDATE employee SET name = ?, contact_num = ?, address = ?, cccd = ?, password = ?, designation = ? WHERE emp_id = ?"
+            )
+            cur.execute(update, [ename, econtact, eadd, eidentification, epass, edes, emp_id])
+            db.commit()
+            messagebox.showinfo("Success!!", "Employee ID: {} Đã chỉnh sửa dữ liệu.".format(emp_id))
+            self.clearr()
+    def clearr(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry5.delete(0, END)
+        self.entry6.delete(0, END)
 
     def testint(self, val):
         if val.isdigit():
