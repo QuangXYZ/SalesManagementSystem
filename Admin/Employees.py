@@ -7,7 +7,6 @@ import re
 import string
 import random
 
-
 root = Tk()
 width = 1366
 height = 768
@@ -21,41 +20,46 @@ root.title("Retail Manager(ADMIN)")
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
 
+
 def random_emp_id(stringLength):
     Digits = string.digits
-    strr=''.join(random.choice(Digits) for i in range(stringLength-3))
-    return ('EMP'+strr)
+    strr = ''.join(random.choice(Digits) for i in range(stringLength - 3))
+    return ('EMP' + strr)
+
 
 def valid_phone(phn):
-    if re.match(r"[0]\d{9}$", phn):#[0]: bắt đầu bằng số 0, \d: đại diện ký tự từ 0-9, {9}: bắt buộc có 9 ký tự
+    if re.match(r"[0]\d{9}$", phn):  # [0]: bắt đầu bằng số 0, \d: đại diện ký tự từ 0-9, {9}: bắt buộc có 9 ký tự
         return True
     return False
+
 
 def valid_identification(aad):
-    if aad.isdigit() and len(aad)==12:
+    if aad.isdigit() and len(aad) == 12:
         return True
     return False
 
-def checkData(name, contact, identification, designation, address, password):
+
+def checkData(e_add, name, contact, identification, designation, address, password):
     if not name:
-        messagebox.showerror("Lỗi!", "Vui lòng nhập tên.", parent=e_add)
+        messagebox.showerror("Error!", "Vui lòng nhập tên.", parent=e_add)
         return False
     if valid_phone(contact) is False:
-        messagebox.showerror("Lỗi!", "Số điện thoại không hợp lệ.", parent=e_add)
+        messagebox.showerror("Error!", "Số điện thoại không hợp lệ.", parent=e_add)
         return False
     if valid_identification(identification) is False:
-        messagebox.showerror("Lỗi!", "Số căn cước không hợp lệ.", parent=e_add)
+        messagebox.showerror("Error!", "Số căn cước không hợp lệ.", parent=e_add)
         return False
     if not designation:
-        messagebox.showerror("Lỗi!", "Vui lòng nhập quyền.", parent=e_add)
+        messagebox.showerror("Error!", "Vui lòng nhập quyền.", parent=e_add)
         return False
     if not address:
-        messagebox.showerror("Lỗi!", "Vui lòng nhập địa chỉ.", parent=e_add)
+        messagebox.showerror("Error!", "Vui lòng nhập địa chỉ.", parent=e_add)
         return False
     if not password:
-        messagebox.showerror("Lỗi!", "Vui lòng nhập password.", parent=e_add)
+        messagebox.showerror("Error!", "Vui lòng nhập password.", parent=e_add)
         return False
     return True
+
 
 class Employee:
     def __init__(self, top=None):
@@ -92,7 +96,7 @@ class Employee:
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""Search""")
-        #self.button1.configure(command=self.search_emp)
+        # self.button1.configure(command=self.search_emp)
 
         self.button2 = Button(root)
         self.button2.place(relx=0.035, rely=0.106, width=76, height=23)
@@ -144,7 +148,7 @@ class Employee:
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
         self.button5.configure(text="""DELETE EMPLOYEE""")
-        #self.button5.configure(command=self.delete_emp)
+        self.button5.configure(command=self.delete_emp)
 
         self.button6 = Button(root)
         self.button6.place(relx=0.135, rely=0.885, width=76, height=23)
@@ -168,7 +172,7 @@ class Employee:
         )
         self.tree.configure(selectmode="extended")
 
-        #self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
+        self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
         self.scrollbary.configure(command=self.tree.yview)
         self.scrollbarx.configure(command=self.tree.xview)
@@ -225,13 +229,82 @@ class Employee:
         self.tree.delete(*self.tree.get_children())
         self.DisplayData()
 
+    def ex2(self):
+        e_update.destroy()
+        self.tree.delete(*self.tree.get_children())
+        self.DisplayData()
+
     sel = []
+
+    def on_tree_select(self, Event):
+        self.sel.clear()
+        for i in self.tree.selection():
+            if i not in self.sel:
+                self.sel.append(i)
+
     def update_emp(self):
+
+        if len(self.sel) == 1:
             global e_update
             e_update = Toplevel()
-            page8 = Update_Employee(e_update)
+            page3 = Update_Employee(e_update)
+            # page3.time()
             e_update.protocol("WM_DELETE_WINDOW", self.ex2)
-            e_add.mainloop()
+            global vall
+            vall = []
+            for i in self.sel:
+                for j in self.tree.item(i)["values"]:
+                    print(str(j))
+                    vall.append(j)
+
+            page3.entry1.insert(0, vall[1])
+            page3.entry2.insert(0, vall[2])
+            page3.entry3.insert(0, vall[4])
+            page3.entry4.insert(0, vall[6])
+            page3.entry5.insert(0, vall[3])
+            page3.entry6.insert(0, vall[5])
+            e_update.mainloop()
+        elif len(self.sel) == 0:
+            messagebox.showerror("Error", "Hãy chọn nhân viên cần cập nhất.")
+        else:
+            messagebox.showerror("Error", "Chỉ có thể cập nhật 1 nhân viên mỗi lần .")
+
+    def delete_emp(self):
+        val = []
+        to_delete = []
+
+        if len(self.sel) != 0:
+            sure = messagebox.askyesno("Confirm", "Bạn có chắc chắn muốn xóa những nhân viên đã chọn không?")
+            if sure == True:
+                for i in self.sel:
+                    for j in self.tree.item(i)["values"]:
+                        val.append(j)
+
+                for j in range(len(val)):
+                    if j % 7 == 0:
+                        to_delete.append(val[j])
+
+                flag = 1
+
+                for k in to_delete:
+                    if k == "ADM002":
+                        flag = 0
+                        break
+                    else:
+                        delete = "DELETE FROM employee WHERE emp_id = ?"
+                        cur.execute(delete, [k])
+                        db.commit()
+
+                if flag == 1:
+                    messagebox.showinfo("Success!!", "Các nhân viên đã xóa khỏi dữ liệu.")
+                    self.sel.clear()
+                    self.tree.delete(*self.tree.get_children())
+                    self.DisplayData()
+                else:
+                    messagebox.showerror("Error!!", "Không thể xóa quản trị viên.")
+        else:
+            messagebox.showerror("Error!!", "Vui lòng chọn nhân viên.")
+
 
 class add_employee:
     def __init__(self, top=None):
@@ -305,7 +378,7 @@ class add_employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
-        #self.button2.configure(command=self.clearr)
+        self.button2.configure(command=self.clearr)
 
     def time(self):
         string = strftime("%H:%M:%S %p")
@@ -319,18 +392,25 @@ class add_employee:
         edes = self.entry4.get()
         eadd = self.entry5.get()
         epass = self.entry6.get()
-        #def checkData(self, name, contact, identification, designation, address, password):
-        if checkData(ename, econtact, eidentification, edes, eadd, epass):
+        # def checkData(self, name, contact, identification, designation, address, password):
+        if checkData(e_add, ename, econtact, eidentification, edes, eadd, epass):
             emp_id = random_emp_id(7)
             insert = (
                 "INSERT INTO employee(emp_id, name, contact_num, address, cccd, password, designation) VALUES(?,?,?,?,?,?,?)"
             )
             cur.execute(insert, [emp_id, ename, econtact, eadd, eidentification, epass, edes])
             db.commit()
-            messagebox.showinfo("Success!!", "Employee ID: {} successfully added in database.".format(emp_id),parent=e_add)
+            messagebox.showinfo("Success!!", "Employee ID: {} Đã thêm thành công vào cơ sở dữ liệu.".format(emp_id),
+                                parent=e_add)
             self.clearr()
-        else:
-            messagebox.showinfo("Lỗi!!", "Xảy ra lỗi.",parent=e_add)
+
+    def clearr(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry6.delete(0, END)
+        self.entry5.delete(0, END)
 
     def testint(self, val):
         if val.isdigit():
@@ -406,7 +486,7 @@ class Update_Employee:
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""UPDATE""")
-        # self.button1.configure(command=self.update)
+        self.button1.configure(command=self.update)
 
         self.button2 = Button(e_update)
         self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
@@ -419,7 +499,15 @@ class Update_Employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
-        # self.button2.configure(command=self.clearr)
+        self.button2.configure(command=self.clearr)
+
+    def clearr(self):
+        self.entry1.delete(0, END)
+        self.entry2.delete(0, END)
+        self.entry3.delete(0, END)
+        self.entry4.delete(0, END)
+        self.entry5.delete(0, END)
+        self.entry6.delete(0, END)
 
     def testint(self, val):
         if val.isdigit():
@@ -435,6 +523,29 @@ class Update_Employee:
             return True
         return False
 
+    def update(self):
+        ename = self.entry1.get()
+        econtact = self.entry2.get()
+        eidentification = self.entry3.get()
+        edes = self.entry4.get()
+        eadd = self.entry5.get()
+        epass = self.entry6.get()
+        # def checkData(self, name, contact, identification, designation, address, password):
+        if checkData(e_update, ename, econtact, eidentification, edes, eadd, epass):
+            emp_id = vall[0]
+            update = (
+                "UPDATE employee SET name = ?, contact_num = ?, address = ?, cccd = ?, password = ?, designation = ? WHERE emp_id = ?"
+            )
+            cur.execute(update, [ename, econtact, eadd, eidentification, epass, edes, emp_id])
+            db.commit()
+            messagebox.showinfo("Success!!", "Employee ID: {} Chỉnh sửa thông tin nhân viên thành công.".format(emp_id),
+                                parent=e_update)
+            self.clearr()
+            vall.clear()
+            page1.tree.delete(*page1.tree.get_children())
+            page1.DisplayData()
+            Employee.sel.clear()
+            e_update.destroy()
 
 page1 = Employee(root)
 root.mainloop()
