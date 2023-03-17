@@ -1,6 +1,7 @@
 from tkinter import *
 import sqlite3
 from tkinter import messagebox
+import os
 
 root = Tk()
 
@@ -33,6 +34,7 @@ def create_emp():
         "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP002', 'qq', '123456789', 'Hcm', '079202021234', '12345', 'abc')")
     conn.commit()
     conn.close()
+
 class login_page:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -95,7 +97,9 @@ def login(Event=None):
         # page2.time()
         # biller.protocol("WM_DELETE_WINDOW", exitt)
         # biller.mainloop()
-        print("Thành công")
+        root.withdraw()
+        os.system("python ./Employee/Bill.py")
+        root.deiconify()
 
     else:
         messagebox.showerror("Error", "Incorrect username or password.")
