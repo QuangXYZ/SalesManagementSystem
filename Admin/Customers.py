@@ -6,6 +6,7 @@ import string
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+import cv2
 
 
 root = Tk()
@@ -19,7 +20,30 @@ root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
-class Employee:
+
+
+def create_ctm():
+    conn = sqlite3.connect('./Database/database.db')
+
+    # Tạo bảng trong cơ sở dữ liệu
+    conn.execute('''CREATE TABLE Customer
+                    (ctm_id TEXT PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    contact_num TEXT NULL,
+                    address TEXT NULL,
+                    cccd TEXT NULL,                   
+                    img TEXT NULL,
+                    discount TEXT NULL
+                    );''')
+
+    # Thêm dữ liệu vào bảng
+    conn.execute(
+        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM001', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM001.png', '10')")
+    conn.execute(
+        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
+    conn.commit()
+    conn.close()
+class Customer:
     def __init__(self, top=None):
         top.geometry("1366x768")
         top.resizable(0, 0)
@@ -145,38 +169,38 @@ class Employee:
 
         self.tree.configure(
             columns=(
-                "Employee ID",
-                "Employee Name",
+                "Customer ID",
+                "Customer Name",
                 "Contact No.",
                 "Address",
-                "cccd",
-                "Password",
-                "Designation"
+                "Cccd",
+                "Image",
+                "Discount"
             )
         )
 
-        self.tree.heading("Employee ID", text="Employee ID", anchor=W)
-        self.tree.heading("Employee Name", text="Employee Name", anchor=W)
+        self.tree.heading("Customer ID", text="Customer ID", anchor=W)
+        self.tree.heading("Customer Name", text="Customer Name", anchor=W)
         self.tree.heading("Contact No.", text="Contact No.", anchor=W)
         self.tree.heading("Address", text="Address", anchor=W)
-        self.tree.heading("cccd", text="CCCD No.", anchor=W)
-        self.tree.heading("Password", text="Password", anchor=W)
-        self.tree.heading("Designation", text="Designation", anchor=W)
+        self.tree.heading("Cccd", text="CCCD No.", anchor=W)
+        self.tree.heading("Image", text="Image", anchor=W)
+        self.tree.heading("Discount", text="Discount", anchor=W)
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
-        self.tree.column("#2", stretch=NO, minwidth=0, width=260)
+        self.tree.column("#2", stretch=NO, minwidth=0, width=220)
         self.tree.column("#3", stretch=NO, minwidth=0, width=100)
-        self.tree.column("#4", stretch=NO, minwidth=0, width=198)
+        self.tree.column("#4", stretch=NO, minwidth=0, width=140)
         self.tree.column("#5", stretch=NO, minwidth=0, width=80)
-        self.tree.column("#6", stretch=NO, minwidth=0, width=80)
+        self.tree.column("#6", stretch=NO, minwidth=0, width=180)
         self.tree.column("#7", stretch=NO, minwidth=0, width=80)
 
         self.DisplayData()
 
     sel = []
     def DisplayData(self):
-        cur.execute("SELECT * FROM employee")
+        cur.execute("SELECT * FROM Customer")
         fetch = cur.fetchall()
         for data in fetch:
             self.tree.insert("", "end", values=(data))
@@ -191,10 +215,13 @@ class Employee:
             root.destroy()
     def add_emp(self):
         global e_add
+        global emp_id
+        emp_id = random_emp_id(7)
         e_add = Toplevel()
         page2 = add_employee(e_add)
         # page2.time()
         e_add.protocol("WM_DELETE_WINDOW", self.ex)
+        e_add.geometry('{}x{}+{}+{}'.format(width, height, x, y))
         e_add.mainloop()
 
     def search_emp(self):
@@ -232,6 +259,7 @@ class Employee:
             global e_update
             e_update = Toplevel()
             page3 = Update_Employee(e_update)
+            e_update.geometry('{}x{}+{}+{}'.format(width, height, x, y))
             # page3.time()
             e_update.protocol("WM_DELETE_WINDOW", self.exUpdate)
             global vall
@@ -239,13 +267,15 @@ class Employee:
             for i in self.sel:
                 for j in self.tree.item(i)["values"]:
                     vall.append(j)
-
             page3.entry1.insert(0, vall[1])
             page3.entry2.insert(0, vall[2])
             page3.entry3.insert(0, vall[4])
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
+            page3.entry6.configure(state='normal')
             page3.entry6.insert(0, vall[5])
+            page3.entry6.configure(state='disabled')
+
             e_update.mainloop()
         elif len(self.sel) == 0:
             messagebox.showerror("Error", "Hãy chọn khách hàng cần cập nhất.")
@@ -279,12 +309,12 @@ class Employee:
                         flag = 0
                         break
                     else:
-                        delete = "DELETE FROM employee WHERE emp_id = ?"
+                        delete = "DELETE FROM Customer WHERE ctm_id = ?"
                         cur.execute(delete, [k])
                         db.commit()
 
                 if flag == 1:
-                    messagebox.showinfo("Success!!", "Employee(s) deleted from database.", parent=root)
+                    messagebox.showinfo("Success!!", "Xóa thành công (những) khách hàng.", parent=root)
                     self.sel.clear()
                     self.tree.delete(*self.tree.get_children())
                     self.DisplayData()
@@ -300,6 +330,7 @@ class add_employee:
         top.geometry("1366x768")
         top.resizable(0, 0)
         top.title("Thêm khách hàng")
+
 
         self.label1 = Label(e_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
@@ -336,7 +367,7 @@ class add_employee:
         self.entry4.place(relx=0.527, rely=0.296, width=374, height=30)
         self.entry4.configure(font="-family {Poppins} -size 12")
         self.entry4.configure(relief="flat")
-        self.entry4.configure(validate="key", validatecommand=(self.r2, "%P"))
+        self.entry4.configure(validate="key", validatecommand=(self.r1, "%P"))
 
         self.entry5 = Entry(e_add)
         self.entry5.place(relx=0.527, rely=0.413, width=374, height=30)
@@ -346,8 +377,21 @@ class add_employee:
         self.entry6 = Entry(e_add)
         self.entry6.place(relx=0.527, rely=0.529, width=374, height=30)
         self.entry6.configure(font="-family {Poppins} -size 12")
+        self.entry6.configure(state='disabled')
         self.entry6.configure(relief="flat")
-        self.entry6.configure(show="*")
+
+        self.button3 = Button(e_add)
+        self.button3.place(relx=0.800, rely=0.529, width=86, height=30)
+        self.button3.configure(relief="flat")
+        self.button3.configure(overrelief="flat")
+        self.button3.configure(activebackground="#CF1E14")
+        self.button3.configure(cursor="hand2")
+        self.button3.configure(foreground="#ffffff")
+        self.button3.configure(background="#CF1E14")
+        self.button3.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button3.configure(borderwidth="0")
+        self.button3.configure(text="""PHOTO""")
+        self.button3.configure(command=self.takePhoto)
 
         self.button1 = Button(e_add)
         self.button1.place(relx=0.408, rely=0.836, width=96, height=34)
@@ -398,14 +442,15 @@ class add_employee:
                     if edes:
                         if eadd:
                             if epass:
-                                emp_id = random_emp_id(7)
+
+
                                 insert = (
-                                            "INSERT INTO employee(emp_id, name, contact_num, address, cccd, password, designation) VALUES(?,?,?,?,?,?,?)"
+                                            "INSERT INTO Customer(ctm_id, name, contact_num, address, cccd, img, discount) VALUES(?,?,?,?,?,?,?)"
                                         )
                                 cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
                                 db.commit()
                                 messagebox.showinfo("Success!!", "Employee ID: {} successfully added in database.".format(emp_id), parent=e_add)
-                                self.clearr()
+                                self.clearForm()
                             else:
                                 messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
                         else:
@@ -432,6 +477,29 @@ class add_employee:
         elif val == "":
             return True
         return False
+    def takePhoto(self):
+        # Initialize camera object
+        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        while True:
+        # Capture a frame from camera
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Lật ngược chiều dọc
+            flip_frame = cv2.flip(frame, 1)
+            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
+            if cv2.waitKey(1) == ord('q') :
+                # Save the captured frame to file
+                path = "Images/Face_customer/" + emp_id + ".png"
+                cv2.imwrite(path, frame)
+                self.entry6.configure(state='normal')
+                self.entry6.delete(0, "end")
+                self.entry6.insert(0,path)
+                self.entry6.configure(state='disabled')
+                break
+        # Release camera object
+        cap.release()
+        cv2.destroyAllWindows()
 
 # màn hình update khách hàng
 class Update_Employee:
@@ -475,7 +543,7 @@ class Update_Employee:
         self.entry4.place(relx=0.527, rely=0.296, width=374, height=30)
         self.entry4.configure(font="-family {Poppins} -size 12")
         self.entry4.configure(relief="flat")
-        self.entry4.configure(validate="key", validatecommand=(self.r2, "%P"))
+        self.entry4.configure(validate="key", validatecommand=(self.r1, "%P"))
 
         self.entry5 = Entry(e_update)
         self.entry5.place(relx=0.527, rely=0.413, width=374, height=30)
@@ -485,8 +553,21 @@ class Update_Employee:
         self.entry6 = Entry(e_update)
         self.entry6.place(relx=0.527, rely=0.529, width=374, height=30)
         self.entry6.configure(font="-family {Poppins} -size 12")
+        self.entry6.configure(state='disabled')
         self.entry6.configure(relief="flat")
-        self.entry6.configure(show="*")
+
+        self.button3 = Button(e_update)
+        self.button3.place(relx=0.800, rely=0.529, width=86, height=30)
+        self.button3.configure(relief="flat")
+        self.button3.configure(overrelief="flat")
+        self.button3.configure(activebackground="#CF1E14")
+        self.button3.configure(cursor="hand2")
+        self.button3.configure(foreground="#ffffff")
+        self.button3.configure(background="#CF1E14")
+        self.button3.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button3.configure(borderwidth="0")
+        self.button3.configure(text="""PHOTO""")
+        self.button3.configure(command=self.takePhoto)
 
         self.button1 = Button(e_update)
         self.button1.place(relx=0.408, rely=0.836, width=96, height=34)
@@ -530,7 +611,7 @@ class Update_Employee:
                             if epass:
                                 emp_id = vall[0]
                                 update = (
-                                    "UPDATE employee SET name = ?, contact_num = ?, address = ?, aadhar_num = ?, password = ?, designation = ? WHERE emp_id = ?"
+                                    "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ? WHERE ctm_id = ?"
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
                                 db.commit()
@@ -540,20 +621,44 @@ class Update_Employee:
                                 vall.clear()
                                 page1.tree.delete(*page1.tree.get_children())
                                 page1.DisplayData()
-                                Employee.sel.clear()
+                                Customer.sel.clear()
                                 e_update.destroy()
                             else:
-                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_update)
                         else:
-                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_update)
                     else:
-                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_update)
                 else:
-                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_update)
             else:
-                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
         else:
-            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
+
+    def takePhoto(self):
+        # Initialize camera object
+        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        while True:
+        # Capture a frame from camera
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Lật ngược chiều dọc
+            flip_frame = cv2.flip(frame, 1)
+            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
+            if cv2.waitKey(1) == ord('q') :
+                # Save the captured frame to file
+                path = "Images/Face_customer/" + vall[0] + ".png"
+                cv2.imwrite(path, frame)
+                self.entry6.configure(state='normal')
+                self.entry6.delete(0, "end")
+                self.entry6.insert(0,path)
+                self.entry6.configure(state='disabled')
+                break
+        # Release camera object
+        cap.release()
+        cv2.destroyAllWindows()
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -580,7 +685,7 @@ class Update_Employee:
 
 
 def valid_phone(phn):
-    if re.match(r"[789]\d{9}$", phn):
+    if re.match(r"[0]\d{9}$", phn):
         return True
     return False
 
@@ -591,7 +696,7 @@ def valid_cccd(aad):
 def random_emp_id(stringLength):
     Digits = string.digits
     strr=''.join(random.choice(Digits) for i in range(stringLength-3))
-    return ('EMP'+strr)
+    return ('CTM'+strr)
 
-page1 = Employee(root)
+page1 = Customer(root)
 root.mainloop()
