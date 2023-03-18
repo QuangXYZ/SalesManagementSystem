@@ -6,6 +6,7 @@ import string
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+import cv2
 
 
 root = Tk()
@@ -188,11 +189,11 @@ class Customer:
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
-        self.tree.column("#2", stretch=NO, minwidth=0, width=260)
+        self.tree.column("#2", stretch=NO, minwidth=0, width=220)
         self.tree.column("#3", stretch=NO, minwidth=0, width=100)
-        self.tree.column("#4", stretch=NO, minwidth=0, width=198)
+        self.tree.column("#4", stretch=NO, minwidth=0, width=140)
         self.tree.column("#5", stretch=NO, minwidth=0, width=80)
-        self.tree.column("#6", stretch=NO, minwidth=0, width=80)
+        self.tree.column("#6", stretch=NO, minwidth=0, width=180)
         self.tree.column("#7", stretch=NO, minwidth=0, width=80)
 
         self.DisplayData()
@@ -214,6 +215,8 @@ class Customer:
             root.destroy()
     def add_emp(self):
         global e_add
+        global emp_id
+        emp_id = random_emp_id(7)
         e_add = Toplevel()
         page2 = add_employee(e_add)
         # page2.time()
@@ -264,13 +267,15 @@ class Customer:
             for i in self.sel:
                 for j in self.tree.item(i)["values"]:
                     vall.append(j)
-
             page3.entry1.insert(0, vall[1])
             page3.entry2.insert(0, vall[2])
             page3.entry3.insert(0, vall[4])
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
+            page3.entry6.configure(state='normal')
             page3.entry6.insert(0, vall[5])
+            page3.entry6.configure(state='disabled')
+
             e_update.mainloop()
         elif len(self.sel) == 0:
             messagebox.showerror("Error", "Hãy chọn khách hàng cần cập nhất.")
@@ -326,6 +331,7 @@ class add_employee:
         top.resizable(0, 0)
         top.title("Thêm khách hàng")
 
+
         self.label1 = Label(e_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
         self.img = PhotoImage(file="./Images/add_employee.png")
@@ -375,7 +381,7 @@ class add_employee:
         self.entry6.configure(relief="flat")
 
         self.button3 = Button(e_add)
-        self.button3.place(relx=0.800, rely=0.523, width=86, height=30)
+        self.button3.place(relx=0.800, rely=0.529, width=86, height=30)
         self.button3.configure(relief="flat")
         self.button3.configure(overrelief="flat")
         self.button3.configure(activebackground="#CF1E14")
@@ -436,7 +442,7 @@ class add_employee:
                     if edes:
                         if eadd:
                             if epass:
-                                emp_id = random_emp_id(7)
+
 
                                 insert = (
                                             "INSERT INTO Customer(ctm_id, name, contact_num, address, cccd, img, discount) VALUES(?,?,?,?,?,?,?)"
@@ -473,16 +479,27 @@ class add_employee:
         return False
     def takePhoto(self):
         # Initialize camera object
-        cap = cv2.VideoCapture(0)
-
+        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        while True:
         # Capture a frame from camera
-        ret, frame = cap.read()
-
-        # Save the captured frame to file
-        cv2.imwrite('captured_image.jpg', frame)
-
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Lật ngược chiều dọc
+            flip_frame = cv2.flip(frame, 1)
+            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
+            if cv2.waitKey(1) == ord('q') :
+                # Save the captured frame to file
+                path = "Images/Face_customer/" + emp_id + ".png"
+                cv2.imwrite(path, frame)
+                self.entry6.configure(state='normal')
+                self.entry6.delete(0, "end")
+                self.entry6.insert(0,path)
+                self.entry6.configure(state='disabled')
+                break
         # Release camera object
         cap.release()
+        cv2.destroyAllWindows()
 
 # màn hình update khách hàng
 class Update_Employee:
@@ -536,7 +553,21 @@ class Update_Employee:
         self.entry6 = Entry(e_update)
         self.entry6.place(relx=0.527, rely=0.529, width=374, height=30)
         self.entry6.configure(font="-family {Poppins} -size 12")
+        self.entry6.configure(state='disabled')
         self.entry6.configure(relief="flat")
+
+        self.button3 = Button(e_update)
+        self.button3.place(relx=0.800, rely=0.529, width=86, height=30)
+        self.button3.configure(relief="flat")
+        self.button3.configure(overrelief="flat")
+        self.button3.configure(activebackground="#CF1E14")
+        self.button3.configure(cursor="hand2")
+        self.button3.configure(foreground="#ffffff")
+        self.button3.configure(background="#CF1E14")
+        self.button3.configure(font="-family {Poppins SemiBold} -size 14")
+        self.button3.configure(borderwidth="0")
+        self.button3.configure(text="""PHOTO""")
+        self.button3.configure(command=self.takePhoto)
 
         self.button1 = Button(e_update)
         self.button1.place(relx=0.408, rely=0.836, width=96, height=34)
@@ -604,6 +635,30 @@ class Update_Employee:
                 messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
         else:
             messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
+
+    def takePhoto(self):
+        # Initialize camera object
+        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        while True:
+        # Capture a frame from camera
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Lật ngược chiều dọc
+            flip_frame = cv2.flip(frame, 1)
+            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
+            if cv2.waitKey(1) == ord('q') :
+                # Save the captured frame to file
+                path = "Images/Face_customer/" + vall[0] + ".png"
+                cv2.imwrite(path, frame)
+                self.entry6.configure(state='normal')
+                self.entry6.delete(0, "end")
+                self.entry6.insert(0,path)
+                self.entry6.configure(state='disabled')
+                break
+        # Release camera object
+        cap.release()
+        cv2.destroyAllWindows()
 
     def clearr(self):
         self.entry1.delete(0, END)
