@@ -1,6 +1,7 @@
 from tkinter import *
 import sqlite3
 from tkinter import messagebox
+import os
 
 root = Tk()
 
@@ -96,7 +97,9 @@ def login(Event=None):
         # page2.time()
         # biller.protocol("WM_DELETE_WINDOW", exitt)
         # biller.mainloop()
-        print("Thành công")
+        root.withdraw()
+        os.system("python ./Employee/Bill.py")
+        root.deiconify()
 
     else:
         messagebox.showerror("Error", "Incorrect username or password.")
