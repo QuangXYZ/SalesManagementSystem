@@ -65,7 +65,7 @@ class Employee:
 
         self.label1 = Label(root)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./images/employee.png")
+        self.img = PhotoImage(file="./images/employee2.png")
         self.label1.configure(image=self.img)
 
         self.message = Label(root)
@@ -73,7 +73,7 @@ class Employee:
         self.message.configure(font="-family {Poppins} -size 10")
         self.message.configure(foreground="#000000")
         self.message.configure(background="#ffffff")
-        self.message.configure(text="""ADMIN""")
+        self.message.configure(text="""Quản trị viên""")
         self.message.configure(anchor="w")
 
         self.entry1 = Entry(root)
@@ -91,7 +91,7 @@ class Employee:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""Search""")
+        self.button1.configure(text="""Tìm kiếm""")
         self.button1.configure(command=self.search_emp)
 
         self.button2 = Button(root)
@@ -104,7 +104,7 @@ class Employee:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""Logout""")
+        self.button2.configure(text="""Đăng xuất""")
         # self.button2.configure(command=self.Logout)
 
         self.button3 = Button(root)
@@ -117,7 +117,7 @@ class Employee:
         self.button3.configure(background="#CF1E14")
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
-        self.button3.configure(text="""ADD EMPLOYEE""")
+        self.button3.configure(text="""THÊM NHÂN VIÊN""")
         self.button3.configure(command=self.add_emp)
 
         self.button4 = Button(root)
@@ -130,7 +130,7 @@ class Employee:
         self.button4.configure(background="#CF1E14")
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
-        self.button4.configure(text="""UPDATE EMPLOYEE""")
+        self.button4.configure(text="""CHỈNH SỬA NHÂN VIÊN""")
         self.button4.configure(command=self.update_emp)
 
         self.button5 = Button(root)
@@ -143,7 +143,7 @@ class Employee:
         self.button5.configure(background="#CF1E14")
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
-        self.button5.configure(text="""DELETE EMPLOYEE""")
+        self.button5.configure(text="""XÓA NHÂN VIÊN""")
         self.button5.configure(command=self.delete_emp)
 
         self.button6 = Button(root)
@@ -156,7 +156,7 @@ class Employee:
         self.button6.configure(background="#CF1E14")
         self.button6.configure(font="-family {Poppins SemiBold} -size 12")
         self.button6.configure(borderwidth="0")
-        self.button6.configure(text="""EXIT""")
+        self.button6.configure(text="""THOÁT""")
         # self.button6.configure(command=self.Exit)
 
         self.scrollbarx = Scrollbar(root, orient=HORIZONTAL)
@@ -178,23 +178,23 @@ class Employee:
 
         self.tree.configure(
             columns=(
-                "Employee ID",
-                "Employee Name",
-                "Contact No.",
-                "Address",
-                "Aadhar No.",
-                "Password",
-                "Designation"
+                "Mã nhân viên",
+                "Tên nhân viên",
+                "Số điện thoại",
+                "Địa chỉ",
+                "Căn cước",
+                "Mật khẩu",
+                "Quyền"
             )
         )
 
-        self.tree.heading("Employee ID", text="Employee ID", anchor=W)
-        self.tree.heading("Employee Name", text="Employee Name", anchor=W)
-        self.tree.heading("Contact No.", text="Contact No.", anchor=W)
-        self.tree.heading("Address", text="Address", anchor=W)
-        self.tree.heading("Aadhar No.", text="Aadhar No.", anchor=W)
-        self.tree.heading("Password", text="Password", anchor=W)
-        self.tree.heading("Designation", text="Designation", anchor=W)
+        self.tree.heading("Mã nhân viên", text="Mã nhân viên", anchor=W)
+        self.tree.heading("Tên nhân viên", text="Tên nhân viên", anchor=W)
+        self.tree.heading("Số điện thoại", text="Số điện thoại", anchor=W)
+        self.tree.heading("Địa chỉ", text="Địa chỉ", anchor=W)
+        self.tree.heading("Căn cước", text="Căn cước", anchor=W)
+        self.tree.heading("Mật khẩu", text="Mật khẩu", anchor=W)
+        self.tree.heading("Quyền", text="Quyền", anchor=W)
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
@@ -323,7 +323,7 @@ class add_employee:
 
         self.label1 = Label(e_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./images/add_employee.png")
+        self.img = PhotoImage(file="./images/add_employee1.png")
         self.label1.configure(image=self.img)
 
         self.r1 = e_add.register(self.testint)
@@ -445,7 +445,7 @@ class Update_Employee:
 
         self.label1 = Label(e_update)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./images/update_employee.png")
+        self.img = PhotoImage(file="./images/update_employee1.png")
         self.label1.configure(image=self.img)
 
         self.r1 = e_update.register(self.testint)
