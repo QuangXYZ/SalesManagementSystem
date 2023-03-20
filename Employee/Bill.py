@@ -508,6 +508,7 @@ class bill_window:
                 messagebox.showinfo("Info","Not is loyal employee")
                 self.entry1.insert(0,"")
             else:
+
                 self.entry1.insert(0,faceRecog.FaceRecognition().run_recognition())
             windowChooseTypeOfCus.destroy()
             
