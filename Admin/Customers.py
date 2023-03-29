@@ -50,7 +50,7 @@ class Customer:
         top.title("Quản lý khách hàng")
         self.label1 = Label(root)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./Images/employee.png")
+        self.img = PhotoImage(file="./Images/customer.png")
         self.label1.configure(image=self.img)
 
         self.message = Label(root)
@@ -334,7 +334,7 @@ class add_employee:
 
         self.label1 = Label(e_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./Images/add_employee.png")
+        self.img = PhotoImage(file="./Images/add_customer.png")
         self.label1.configure(image=self.img)
 
         self.clock = Label(e_add)
@@ -510,7 +510,7 @@ class Update_Employee:
 
         self.label1 = Label(e_update)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
-        self.img = PhotoImage(file="./images/update_employee.png")
+        self.img = PhotoImage(file="./images/update_customer.png")
         self.label1.configure(image=self.img)
 
         self.clock = Label(e_update)
