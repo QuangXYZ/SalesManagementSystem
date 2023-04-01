@@ -1,4 +1,3 @@
-import os
 import sqlite3
 from time import strftime
 from tkinter import *
@@ -106,7 +105,7 @@ class Employee:
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""Đăng xuất""")
-        self.button2.configure(command=self.Logout)
+        # self.button2.configure(command=self.Logout)
 
         self.button3 = Button(root)
         self.button3.place(relx=0.052, rely=0.432, width=306, height=28)
@@ -158,7 +157,7 @@ class Employee:
         self.button6.configure(font="-family {Poppins SemiBold} -size 12")
         self.button6.configure(borderwidth="0")
         self.button6.configure(text="""THOÁT""")
-        self.button6.configure(command=self.Exit)
+        # self.button6.configure(command=self.Exit)
 
         self.scrollbarx = Scrollbar(root, orient=HORIZONTAL)
         self.scrollbary = Scrollbar(root, orient=VERTICAL)
@@ -208,17 +207,6 @@ class Employee:
 
         self.DisplayData()
 
-    def Logout(self):
-        sure = messagebox.askyesno("Logout", "Bạn có muốn đăng xuất?")
-        if sure == True:
-            root.destroy()
-            os.system("python ./Admin/Login.py")
-
-    def Exit(self):
-        sure = messagebox.askyesno("Exit","Bạn có chắc chắn muốn thoát không?", parent=root)
-        if sure == True:
-            root.destroy()
-
     def DisplayData(self):
         cur.execute("SELECT * FROM employee")
         fetch = cur.fetchall()
@@ -263,7 +251,7 @@ class Employee:
                     vall.append(j)
 
             page3.entry1.insert(0, vall[1])
-            page3.entry2.insert(0, '0' + str(vall[2]))
+            page3.entry2.insert(0, vall[2])
             page3.entry3.insert(0, vall[4])
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
