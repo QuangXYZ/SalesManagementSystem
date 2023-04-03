@@ -226,6 +226,7 @@ class Inventory:
         page4 = add_product(p_add)
         p_add.mainloop()
 
+
     def delete_product(self):
         val = []
         to_delete = []
