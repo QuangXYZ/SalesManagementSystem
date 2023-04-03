@@ -21,7 +21,6 @@ lname = StringVar()
 new_user = StringVar()
 new_passwd = StringVar()
 
-
 cust_name = StringVar()
 cust_num = StringVar()
 cust_new_bill = StringVar()
@@ -63,11 +62,11 @@ class Cart:
     def remove_items(self):
         self.items.clear()
 
-    def total(self):
+    def total(self,discount):
         total = 0.0
         for i in self.items:
             total += i.price * i.qty
-        return total
+        return total - total * discount / 100
 
     def isEmpty(self):
         if len(self.items)==0:
@@ -405,7 +404,7 @@ class bill_window:
                     messagebox.showerror("Oops!", "Invalid quantity.", parent=bill_root)
             else:
                 messagebox.showerror("Oops!", "Choose a product.", parent=bill_root)
-
+    
     def remove_product(self):
         if(self.cart.isEmpty()!=True):
             self.Scrolledtext1.configure(state="normal")
@@ -474,7 +473,7 @@ class bill_window:
         self.bill_date_message.configure(borderwidth=0)
         self.bill_date_message.configure(background="#ffffff")
     
-    def total_bill(self):
+    def total_bill(self, discount):
         if self.cart.isEmpty():
             messagebox.showerror("Oops!", "Add a product.", parent=bill_root)
         else:
@@ -484,7 +483,7 @@ class bill_window:
                 self.Scrolledtext1.configure(state="normal")
                 divider = "\n\n\n"+("─"*61)
                 self.Scrolledtext1.insert('insert', divider)
-                total = "\nTotal\t\t\t\t\t\t\t\t\t\t\tRs. {}".format(self.cart.total())
+                total = "\nTotal\t\t\t\t\t\t\t\t\t\t\tRs. {}".format(self.cart.total(discount))
                 self.Scrolledtext1.insert('insert', total)
                 divider2 = "\n"+("─"*61)
                 self.Scrolledtext1.insert('insert', divider2)
@@ -499,17 +498,25 @@ class bill_window:
         stringSet = "120x120" + "+" + str(x) + "+" + str(y)
         windowChooseTypeOfCus.geometry(stringSet)
         windowChooseTypeOfCus.resizable(FALSE,FALSE)
-        
+        self.discount = 0
         def openCamera():
             import faceRecog
+            with sqlite3.connect("./Database/database.db") as db:
+                curCus = db.cursor()
+            
             self.entry1.delete(0,END)
-            name = faceRecog.FaceRecognition().run_recognition()
-            if name == "Unknown":
+            idCus = faceRecog.FaceRecognition().run_recognition().split(".")[0]
+            curCus.execute(f"SELECT isLoyal from Customer WHERE ctm_id='{idCus}'")
+            listCusIDImg =curCus.fetchall()[0]
+            if idCus == "Unknown":
                 messagebox.showinfo("Info","Not is loyal employee")
                 self.entry1.insert(0,"")
-            else:
-
-                self.entry1.insert(0,faceRecog.FaceRecognition().run_recognition())
+            elif (listCusIDImg[0] == 'TRUE'):
+                curCus.execute(f"SELECT name from Customer WHERE ctm_id='{idCus}'")
+                name = curCus.fetchall()[0]
+                curCus.execute(f"SELECT discount from Customer WHERE ctm_id='{idCus}'")
+                self.discount = int(curCus.fetchall()[0][0])
+                self.entry1.insert(0,name[0])
             windowChooseTypeOfCus.destroy()
             
         button1 = Button(windowChooseTypeOfCus)
@@ -528,10 +535,11 @@ class bill_window:
         
     
     state = 1
+    # discount
     def gen_bill(self):
         if cust_name.get() == "":
             self.chooseTypeOfCus()
-            
+        
         if self.state == 1:
             strr = self.Scrolledtext1.get('1.0', END)
             self.wel_bill()
@@ -545,7 +553,7 @@ class bill_window:
                 messagebox.showerror("Oops!", "Cart is empty.", parent=bill_root)
             else: 
                 if strr.find('Total')==-1:
-                    self.total_bill()
+                    self.total_bill(self.discount)
                     self.gen_bill()
                 else:
                     self.name_message.insert(END, cust_name.get())
