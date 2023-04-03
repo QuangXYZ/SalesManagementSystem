@@ -1,7 +1,9 @@
 # ==================imports===================
 import os
+import random
 import re
 import sqlite3
+import string
 from tkinter import *
 from tkinter import ttk, messagebox
 
@@ -29,7 +31,9 @@ def create_emp():
 
     # Tạo bảng trong cơ sở dữ liệu
     conn.execute('''CREATE TABLE raw_inventory
-                    (product_name TEXT PRIMARY KEY NOT NULL,
+                    (
+                    product_id TEXT PRIMARY KEY NOT NULL,
+                    product_name TEXT NOT NULL,
                     product_cat TEXT NOT NULL,
                     product_subcat TEXT NULL,
                     stock TEXT NULL,                               
@@ -40,7 +44,7 @@ def create_emp():
 
     # Thêm dữ liệu vào bảng
     conn.execute(
-        "INSERT INTO raw_inventory (product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES ('SP001', 'John Doe', '123456789', 'Hcm', '079202021234', '12345', 'Employee')")
+        "INSERT INTO raw_inventory (product_id,product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES ('SP001', 'John Doe', '123456789', 'Hcm', '079202021234', '12345', 'Employee')")
 
     conn.commit()
     conn.close()
@@ -226,7 +230,6 @@ class Inventory:
         page4 = add_product(p_add)
         p_add.mainloop()
 
-
     def delete_product(self):
         val = []
         to_delete = []
@@ -247,13 +250,13 @@ class Inventory:
                     cur.execute(delete, [k])
                     db.commit()
 
-                messagebox.showinfo("Success!!", "Products deleted from database.", parent=root)
+                messagebox.showinfo("Thành công!!", "Sản phẩm đã được xóa khỏi cơ sở dữ liệu.", parent=root)
                 self.sel.clear()
                 self.tree.delete(*self.tree.get_children())
 
                 self.DisplayData()
         else:
-            messagebox.showerror("Error!!", "Please select a product.", parent=root)
+            messagebox.showerror("Lỗi!!", "Vui lòng chọn sản phẩm.", parent=root)
 
     def Logout(self):
         sure = messagebox.askyesno("Logout", "Bạn có muốn đăng xuất?")
@@ -282,17 +285,17 @@ class Inventory:
         try:
             to_search = int(self.entry1.get())
         except ValueError:
-            messagebox.showerror("Oops!!", "Invalid Product Id.", parent=root)
+            messagebox.showerror("Oops!!", "Mã sản phẩm không hợp lệ.", parent=root)
         else:
             for search in val:
                 if search == to_search:
                     self.tree.selection_set(val[val.index(search) - 1])
                     self.tree.focus(val[val.index(search) - 1])
-                    messagebox.showinfo("Success!!", "Product ID: {} found.".format(self.entry1.get()),
+                    messagebox.showinfo("Thành công!!", "Mã sản phẩm: {} được tìm thấy.".format(self.entry1.get()),
                                         parent=root)
                     break
             else:
-                messagebox.showerror("Oops!!", "Product ID: {} not found.".format(self.entry1.get()),
+                messagebox.showerror("Lỗi!!", "Mã sản phẩm: {} không được tìm thấy.".format(self.entry1.get()),
                                      parent=root)
 
     sel = []
@@ -330,9 +333,9 @@ class Inventory:
 
 
         elif len(self.sel) == 0:
-            messagebox.showerror("Error", "Please choose a product to update.", parent=root)
+            messagebox.showerror("Lỗi", "Vui lòng chọn sản phẩm để chỉnh sửa.", parent=root)
         else:
-            messagebox.showerror("Error", "Can only update one product at a time.", parent=root)
+            messagebox.showerror("Lỗi", "Chỉ có thể chỉnh sửa một sản phẩm một lúc !.", parent=root)
 
         p_update.mainloop()
 
@@ -341,7 +344,7 @@ class add_product:
     def __init__(self, top=None):
         top.geometry("1366x768")
         top.resizable(0, 0)
-        top.title("Add Product")
+        top.title("Thêm sản phẩm")
 
         self.label1 = Label(p_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
@@ -420,6 +423,7 @@ class add_product:
         self.button2.configure(command=self.clearr)
 
     def add(self):
+        pid = random_emp_id(5)
         pqty = self.entry3.get()
         pcat = self.entry2.get()
         pmrp = self.entry4.get()
@@ -436,44 +440,44 @@ class add_product:
                             try:
                                 float(pcp)
                             except ValueError:
-                                messagebox.showerror("Oops!", "Invalid cost price.", parent=p_add)
+                                messagebox.showerror("Lỗi!", "Giá bán không hợp lệ.", parent=p_add)
                             else:
                                 if pmrp:
                                     try:
                                         float(pmrp)
                                     except ValueError:
-                                        messagebox.showerror("Oops!", "Invalid MRP.", parent=p_add)
+                                        messagebox.showerror("Lỗi!", "MRP không hợp lệ.", parent=p_add)
                                     else:
                                         if valid_phone(pvendor):
-                                            with sqlite3.connect("./Database/store.db") as db:
+                                            with sqlite3.connect("./Database/database.db") as db:
                                                 cur = db.cursor()
                                             insert = (
-                                                "INSERT INTO raw_inventory(product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES(?,?,?,?,?,?,?)"
+                                                "INSERT INTO raw_inventory(product_id,product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES(?,?,?,?,?,?,?,?)"
                                             )
                                             cur.execute(insert,
-                                                        [pname, pcat, psubcat, int(pqty), float(pmrp), float(pcp),
+                                                        [pid,pname, pcat, psubcat, int(pqty), float(pmrp), float(pcp),
                                                          pvendor])
                                             db.commit()
-                                            messagebox.showinfo("Success!!", "Product successfully added in inventory.",
+                                            messagebox.showinfo("Thành công!!", "Sản phẩm đã được thêm vào giỏ hàng.",
                                                                 parent=p_add)
                                             p_add.destroy()
                                             page3.tree.delete(*page3.tree.get_children())
                                             page3.DisplayData()
                                             p_add.destroy()
                                         else:
-                                            messagebox.showerror("Oops!", "Invalid phone number.", parent=p_add)
+                                            messagebox.showerror("Lỗi!", "Số điện thoại không hợp lệ.", parent=p_add)
                                 else:
-                                    messagebox.showerror("Oops!", "Please enter MRP.", parent=p_add)
+                                    messagebox.showerror("Lỗi!", "Vui lòng nhập MRP.", parent=p_add)
                         else:
-                            messagebox.showerror("Oops!", "Please enter product cost price.", parent=p_add)
+                            messagebox.showerror("Lôi!", "Vui lòng nhập giá bán sản phẩm", parent=p_add)
                     else:
-                        messagebox.showerror("Oops!", "Please enter product quantity.", parent=p_add)
+                        messagebox.showerror("Lỗi!", "Vui lòng nhập số lượng sản phẩm.", parent=p_add)
                 else:
-                    messagebox.showerror("Oops!", "Please enter product sub-category.", parent=p_add)
+                    messagebox.showerror("Lỗi!", "Vui lòng nhập danh mục phụ.", parent=p_add)
             else:
-                messagebox.showerror("Oops!", "Please enter product category.", parent=p_add)
+                messagebox.showerror("Lỗi!", "Vui lòng nhập phân loại sản phẩm.", parent=p_add)
         else:
-            messagebox.showerror("Oops!", "Please enter product name", parent=p_add)
+            messagebox.showerror("Lỗi!", "Vui lòng nhập tên sản phẩm", parent=p_add)
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -490,8 +494,6 @@ class add_product:
         elif val == "":
             return True
         return False
-
-
 
 
 class Update_Product:
@@ -592,13 +594,13 @@ class Update_Product:
                             try:
                                 float(pcp)
                             except ValueError:
-                                messagebox.showerror("Oops!", "Invalid cost price.", parent=p_update)
+                                messagebox.showerror("Lỗi!", "Giá bán không hợp lệ.", parent=p_update)
                             else:
                                 if pmrp:
                                     try:
                                         float(pmrp)
                                     except ValueError:
-                                        messagebox.showerror("Oops!", "Invalid MRP.", parent=p_update)
+                                        messagebox.showerror("Lỗi", "MRP không hợp lệ.", parent=p_update)
                                     else:
                                         if valid_phone(pvendor):
                                             product_id = valll[0]
@@ -611,8 +613,8 @@ class Update_Product:
                                                         [pname, pcat, psubcat, int(pqty), float(pmrp), float(pcp),
                                                          pvendor, product_id])
                                             db.commit()
-                                            messagebox.showinfo("Success!!",
-                                                                "Product successfully updated in inventory.",
+                                            messagebox.showinfo("Thành công!!",
+                                                                "Sản phẩm trong giỏ hàng đã được chỉnh sửa thành công.",
                                                                 parent=p_update)
                                             valll.clear()
                                             Inventory.sel.clear()
@@ -620,19 +622,19 @@ class Update_Product:
                                             page3.DisplayData()
                                             p_update.destroy()
                                         else:
-                                            messagebox.showerror("Oops!", "Invalid phone number.", parent=p_update)
+                                            messagebox.showerror("Lỗi!", "Số điện thoại không hợp lệ.", parent=p_update)
                                 else:
-                                    messagebox.showerror("Oops!", "Please enter MRP.", parent=p_update)
+                                    messagebox.showerror("Lỗi!", "Vui lòng nhập MRP.", parent=p_update)
                         else:
-                            messagebox.showerror("Oops!", "Please enter product cost price.", parent=p_update)
+                            messagebox.showerror("Lỗi!", "Vui lòng nhập giá bán sản phẩm.", parent=p_update)
                     else:
-                        messagebox.showerror("Oops!", "Please enter product quantity.", parent=p_update)
+                        messagebox.showerror("Lỗi!", "Vui lòng nhập số lượng sản phẩm.", parent=p_update)
                 else:
-                    messagebox.showerror("Oops!", "Please enter product sub-category.", parent=p_update)
+                    messagebox.showerror("Lỗi!!", "Vui lòng nhâp danh mục con của sản phẩm.", parent=p_update)
             else:
-                messagebox.showerror("Oops!", "Please enter product category.", parent=p_update)
+                messagebox.showerror("Lỗi!", "Vui lòng nhập phân loại sản phẩm.", parent=p_update)
         else:
-            messagebox.showerror("Oops!", "Please enter product name", parent=p_update)
+            messagebox.showerror("Lỗi!", "Vui lòng nhập tên sản phẩm", parent=p_update)
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -651,12 +653,15 @@ class Update_Product:
         return False
 
 
-
 def valid_phone(phn):
     if re.match(r"[0]\d{9}$", phn):  # [0]: bắt đầu bằng số 0, \d: đại diện ký tự từ 0-9, {9}: bắt buộc có 9 ký tự
         return True
     return False
 
+def random_emp_id(stringLength):
+    Digits = string.digits
+    strr=''.join(random.choice(Digits) for i in range(stringLength-3))
+    return ('SP'+strr)
 
 page1 = Inventory(root)
 root.mainloop()
