@@ -43,12 +43,9 @@ def create_emp():
                     );''')
 
     # Thêm dữ liệu vào bảng
-    conn.execute(
-        "INSERT INTO raw_inventory (product_id,product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES ('SP001', 'John Doe', '123456789', 'Hcm', '079202021234', '12345', 'Employee')")
 
     conn.commit()
     conn.close()
-
 
 def inventory():
     global page3
