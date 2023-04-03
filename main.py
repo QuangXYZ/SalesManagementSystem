@@ -43,6 +43,7 @@ label1.place(relx=0, rely=0, width=1366, height=768)
 img = PhotoImage(file="./images/main.png")
 label1.configure(image=img)
 
+
 button1 = Button(main)
 button1.place(relx=0.316, rely=0.446, width=146, height=90)
 button1.configure(relief="flat")

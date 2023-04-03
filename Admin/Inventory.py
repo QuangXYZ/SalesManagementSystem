@@ -104,7 +104,7 @@ class Inventory:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""Search""")
+        self.button1.configure(text="""Tìm""")
         self.button1.configure(command=self.search_product)
 
         self.button2 = Button(root)
@@ -130,7 +130,7 @@ class Inventory:
         self.button3.configure(background="#CF1E14")
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
-        self.button3.configure(text="""ADD PRODUCT""")
+        self.button3.configure(text="""Thêm sản phẩm""")
         self.button3.configure(command=self.add_product)
 
         self.button4 = Button(root)
@@ -143,7 +143,7 @@ class Inventory:
         self.button4.configure(background="#CF1E14")
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
-        self.button4.configure(text="""UPDATE PRODUCT""")
+        self.button4.configure(text="""Cập nhật sản phẩm""")
         self.button4.configure(command=self.update_product)
 
         self.button5 = Button(root)
@@ -156,7 +156,7 @@ class Inventory:
         self.button5.configure(background="#CF1E14")
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
-        self.button5.configure(text="""DELETE PRODUCT""")
+        self.button5.configure(text="""Xóa sản phẩm""")
         self.button5.configure(command=self.delete_product)
 
         self.button6 = Button(root)
@@ -169,7 +169,7 @@ class Inventory:
         self.button6.configure(background="#CF1E14")
         self.button6.configure(font="-family {Poppins SemiBold} -size 12")
         self.button6.configure(borderwidth="0")
-        self.button6.configure(text="""EXIT""")
+        self.button6.configure(text="""Thoát""")
         self.button6.configure(command=self.Exit)
 
         self.scrollbarx = Scrollbar(root, orient=HORIZONTAL)
@@ -191,25 +191,25 @@ class Inventory:
 
         self.tree.configure(
             columns=(
-                "Product ID",
-                "Name",
-                "Category",
-                "Sub-Category",
-                "In Stock",
-                "MRP",
-                "Cost Price",
-                "Vendor No.",
+                "Mã sản phẩm",
+                "Tên",
+                "Loại sản phẩm",
+                "Danh mục",
+                "Số lượng",
+                "Giá nhập",
+                "Giá bán",
+                "SĐT nhà cung cấp",
             )
         )
 
-        self.tree.heading("Product ID", text="Product ID", anchor=W)
-        self.tree.heading("Name", text="Name", anchor=W)
-        self.tree.heading("Category", text="Category", anchor=W)
-        self.tree.heading("Sub-Category", text="Sub-Category", anchor=W)
-        self.tree.heading("In Stock", text="In Stock", anchor=W)
-        self.tree.heading("MRP", text="MRP", anchor=W)
-        self.tree.heading("Cost Price", text="Cost Price", anchor=W)
-        self.tree.heading("Vendor No.", text="Vendor No.", anchor=W)
+        self.tree.heading("Mã sản phẩm", text="Mã sản phẩm", anchor=W)
+        self.tree.heading("Tên", text="Tên", anchor=W)
+        self.tree.heading("Loại sản phẩm", text="Loại sản phẩm", anchor=W)
+        self.tree.heading("Danh mục", text="Danh mục", anchor=W)
+        self.tree.heading("Số lượng", text="Số lượng", anchor=W)
+        self.tree.heading("Giá nhập", text="Giá nhập", anchor=W)
+        self.tree.heading("Giá bán", text="Giá bán", anchor=W)
+        self.tree.heading("SĐT nhà cung cấp", text="SĐT nhà cung cấp", anchor=W)
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
@@ -228,6 +228,7 @@ class Inventory:
         global page4
         p_add = Toplevel()
         page4 = add_product(p_add)
+        p_add.protocol("WM_DELETE_WINDOW", self.ex)
         p_add.mainloop()
 
     def delete_product(self):
@@ -235,7 +236,7 @@ class Inventory:
         to_delete = []
 
         if len(self.sel) != 0:
-            sure = messagebox.askyesno("Confirm", "Are you sure you want to delete selected products?", parent=root)
+            sure = messagebox.askyesno("Xác nhận", "Bạn có chắc là muốn xóa sản phẩm đã chọn?", parent=root)
             if sure == True:
                 for i in self.sel:
                     for j in self.tree.item(i)["values"]:
@@ -283,7 +284,7 @@ class Inventory:
                 val.append(j)
 
         try:
-            to_search = int(self.entry1.get())
+            to_search = self.entry1.get()
         except ValueError:
             messagebox.showerror("Oops!!", "Mã sản phẩm không hợp lệ.", parent=root)
         else:
@@ -306,8 +307,14 @@ class Inventory:
             if i not in self.sel:
                 self.sel.append(i)
 
-    def ex2(self):
+
+    def ex(self):
         p_add.destroy()
+        self.tree.delete(*self.tree.get_children())
+        self.DisplayData()
+
+    def ex2(self):
+        p_update.destroy()
         self.tree.delete(*self.tree.get_children())
         self.DisplayData()
 
@@ -406,7 +413,7 @@ class add_product:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""ADD""")
+        self.button1.configure(text="""Thêm""")
         self.button1.configure(command=self.add)
 
         self.button2 = Button(p_add)
@@ -419,7 +426,7 @@ class add_product:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(text="""Xóa""")
         self.button2.configure(command=self.clearr)
 
     def add(self):
@@ -460,10 +467,7 @@ class add_product:
                                             db.commit()
                                             messagebox.showinfo("Thành công!!", "Sản phẩm đã được thêm vào giỏ hàng.",
                                                                 parent=p_add)
-                                            p_add.destroy()
-                                            page3.tree.delete(*page3.tree.get_children())
-                                            page3.DisplayData()
-                                            p_add.destroy()
+
                                         else:
                                             messagebox.showerror("Lỗi!", "Số điện thoại không hợp lệ.", parent=p_add)
                                 else:
@@ -561,7 +565,7 @@ class Update_Product:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""UPDATE""")
+        self.button1.configure(text="""Chỉnh sửa""")
         self.button1.configure(command=self.update)
 
         self.button2 = Button(p_update)
@@ -574,7 +578,7 @@ class Update_Product:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(text="""Xóa""")
         self.button2.configure(command=self.clearr)
 
     def update(self):
@@ -604,7 +608,7 @@ class Update_Product:
                                     else:
                                         if valid_phone(pvendor):
                                             product_id = valll[0]
-                                            with sqlite3.connect("./Database/store.db") as db:
+                                            with sqlite3.connect("./Database/database.db") as db:
                                                 cur = db.cursor()
                                             update = (
                                                 "UPDATE raw_inventory SET product_name = ?, product_cat = ?, product_subcat = ?, stock = ?, mrp = ?, cost_price = ?, vendor_phn = ? WHERE product_id = ?"
