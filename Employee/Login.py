@@ -86,7 +86,7 @@ def login(Event=None):
     results = cur.fetchall()
     print(results)
     if results:
-        messagebox.showinfo("Login Page", "The login is successful")
+        messagebox.showinfo("Login Page", "Đăng nhập thành công")
         # page1.entry1.delete(0, END)
         # page1.entry2.delete(0, END)
         # root.withdraw()
@@ -102,7 +102,7 @@ def login(Event=None):
         root.deiconify()
 
     else:
-        messagebox.showerror("Error", "Incorrect username or password.")
+        messagebox.showerror("Error", "Sai tên đăng nhập hoặc mật khâu.")
         # page1.entry2.delete(0, END)
         print("Thất bại")
 

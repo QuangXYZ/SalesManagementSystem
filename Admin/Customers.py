@@ -48,13 +48,9 @@ def create_ctm():
 # cur.execute("drop table Customer")
 # create_ctm()
 # cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
-# print(cur.fetchall())    
-    
-        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM001', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM001.png', '10')")
-    conn.execute(
-        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
-    conn.commit()
-    conn.close()
+# print(cur.fetchall())
+
+
 
 class Customer:
     def __init__(self, top=None):
@@ -192,13 +188,13 @@ class Customer:
             )
         )
 
-        self.tree.heading("Customer ID", text="Customer ID", anchor=W)
-        self.tree.heading("Customer Name", text="Customer Name", anchor=W)
-        self.tree.heading("Contact No.", text="Contact No.", anchor=W)
-        self.tree.heading("Address", text="Address", anchor=W)
+        self.tree.heading("Customer ID", text="ID Khách hàng", anchor=W)
+        self.tree.heading("Customer Name", text="Tên khách hàng", anchor=W)
+        self.tree.heading("Contact No.", text="Số điện thoại.", anchor=W)
+        self.tree.heading("Address", text="Địa chỉ", anchor=W)
         self.tree.heading("Cccd", text="CCCD No.", anchor=W)
-        self.tree.heading("Image", text="Image", anchor=W)
-        self.tree.heading("Discount", text="Discount", anchor=W)
+        self.tree.heading("Image", text="Ảnh", anchor=W)
+        self.tree.heading("Discount", text="Mức giảm giá (%)", anchor=W)
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
@@ -223,7 +219,7 @@ class Customer:
             if i not in self.sel:
                 self.sel.append(i)
     def Exit(self):
-        sure = messagebox.askyesno("Exit","Are you sure you want to exit?", parent=root)
+        sure = messagebox.askyesno("Exit","Bạn có muốn thoát không", parent=root)
         if sure == True:
             root.destroy()
     def add_emp(self):
@@ -249,10 +245,10 @@ class Customer:
             if search == to_search:
                 self.tree.selection_set(val[val.index(search) - 1])
                 self.tree.focus(val[val.index(search) - 1])
-                messagebox.showinfo("Success!!", "Customer ID: {} found.".format(self.entry1.get()), parent=root)
+                messagebox.showinfo("Success!!", "Đã tìm thấy khách hàng : {} .".format(self.entry1.get()), parent=root)
                 break
         else:
-            messagebox.showerror("Oops!!", "Customer ID: {} not found.".format(self.entry1.get()), parent=root)
+            messagebox.showerror("Oops!!", "Không tìm thấy khách hàng {}.".format(self.entry1.get()), parent=root)
 
 
     def ex(self):  # thoát screen thêm kh
@@ -281,8 +277,8 @@ class Customer:
                 for j in self.tree.item(i)["values"]:
                     vall.append(j)
             page3.entry1.insert(0, vall[1])
-            page3.entry2.insert(0, vall[2])
-            page3.entry3.insert(0, vall[4])
+            page3.entry2.insert(0, "0"+str(vall[2]))
+            page3.entry3.insert(0, "0"+str(vall[4]))
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
             page3.entry6.configure(state='normal')
@@ -420,7 +416,7 @@ class add_employee:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""ADD""")
+        self.button1.configure(text="""Thêm""")
         self.button1.configure(command=self.addCustomer)
 
         self.button2 = Button(e_add)
@@ -433,7 +429,7 @@ class add_employee:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(text="""Xóa""")
         self.button2.configure(command=self.clearForm)
 
 
@@ -466,20 +462,20 @@ class add_employee:
                                         )
                                 cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
                                 db.commit()
-                                messagebox.showinfo("Success!!", "Employee ID: {} successfully added in database.".format(emp_id), parent=e_add)
+                                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã được thêm thành công.".format(emp_id), parent=e_add)
                                 self.clearForm()
                             else:
-                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
+                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_add)
                         else:
-                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
+                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_add)
                     else:
-                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
+                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_add)
                 else:
-                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
+                    messagebox.showerror("Oops!", "Chưa điền số CCCD.", parent=e_add)
             else:
-                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
+                messagebox.showerror("Oops!", "Chưa điền số điện thoại.", parent=e_add)
         else:
-            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
+            messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=e_add)
 
     def testint(self, val):
         if val.isdigit():
@@ -611,7 +607,7 @@ class Update_Employee:
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearr)
-      
+
         self.checkButton = Checkbutton(e_update)
         self.stateCheck = BooleanVar()
         self.checkButton.place(relx=0.132, rely=0.6, width=200, height=34)
@@ -642,17 +638,13 @@ class Update_Employee:
                             if epass:
                                 emp_id = vall[0]
                                 update = (
-
                                     "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ?, isLoyal = ? WHERE ctm_id = ?"
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
-                                    "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ? WHERE ctm_id = ?"
-                                )
-                                cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
 
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Employee ID: {} successfully updated in database.".format(emp_id),
+                                                    "Khách hàng ID: {} đã cập nhật thành công .".format(emp_id),
                                                     parent=e_update)
                                 vall.clear()
                                 page1.tree.delete(*page1.tree.get_children())
@@ -660,17 +652,17 @@ class Update_Employee:
                                 Customer.sel.clear()
                                 e_update.destroy()
                             else:
-                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_update)
+                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_update)
                         else:
-                            messagebox.showerror("Oops!", "Please enter address.", parent=e_update)
+                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_update)
                     else:
-                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_update)
+                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_update)
                 else:
-                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_update)
+                    messagebox.showerror("Oops!", "Số CCCD không hợp lệ.", parent=e_update)
             else:
-                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
+                messagebox.showerror("Oops!", "Số điện thoại không hợp lệ", parent=e_update)
         else:
-            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
+            messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=e_update)
 
     def takePhoto(self):
         # Initialize camera object

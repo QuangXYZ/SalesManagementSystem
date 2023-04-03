@@ -74,7 +74,7 @@ class login_page:
         results = cur.fetchall()
         if results:
             if results[0][6] == "Admin":
-                messagebox.showinfo("Login Page", "The login is successful.")
+                messagebox.showinfo("Login Page", "Đăng nhập thành công.")
                 page1.entry1.delete(0, END)
                 page1.entry2.delete(0, END)
 
@@ -84,10 +84,10 @@ class login_page:
 
 
             else:
-                messagebox.showerror("Oops!!", "You are not an admin.")
+                messagebox.showerror("Oops!!", "Bạn không phải Admin.")
 
         else:
-            messagebox.showerror("Error", "Incorrect username or password.")
+            messagebox.showerror("Error", "Sai tên đăng nhập hoặc mật khẩu.")
             page1.entry2.delete(0, END)
 
 
