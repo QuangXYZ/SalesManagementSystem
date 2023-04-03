@@ -1,7 +1,7 @@
 # ==================imports===================
+import os
 import re
 import sqlite3
-from time import strftime
 from tkinter import *
 from tkinter import ttk, messagebox
 
@@ -22,7 +22,8 @@ root.title("Inventory")
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
 
-#tạo data test
+
+# tạo data test
 def create_emp():
     conn = sqlite3.connect('./Database/database.db')
 
@@ -44,11 +45,11 @@ def create_emp():
     conn.commit()
     conn.close()
 
+
 def inventory():
     global page3
     inv = Toplevel()
     page3 = Inventory(inv)
-    # page3.time()
     inv.protocol("WM_DELETE_WINDOW", exitt)
     inv.mainloop()
 
@@ -113,7 +114,7 @@ class Inventory:
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""Logout""")
-        # self.button2.configure(command=self.Logout)
+        self.button2.configure(command=self.Logout)
 
         self.button3 = Button(root)
         self.button3.place(relx=0.052, rely=0.432, width=306, height=28)
@@ -126,7 +127,7 @@ class Inventory:
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
         self.button3.configure(text="""ADD PRODUCT""")
-        # self.button3.configure(command=self.add_product)
+        self.button3.configure(command=self.add_product)
 
         self.button4 = Button(root)
         self.button4.place(relx=0.052, rely=0.5, width=306, height=28)
@@ -139,7 +140,7 @@ class Inventory:
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
         self.button4.configure(text="""UPDATE PRODUCT""")
-        # self.button4.configure(command=self.update_product)
+        self.button4.configure(command=self.update_product)
 
         self.button5 = Button(root)
         self.button5.place(relx=0.052, rely=0.57, width=306, height=28)
@@ -152,7 +153,7 @@ class Inventory:
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
         self.button5.configure(text="""DELETE PRODUCT""")
-        # self.button5.configure(command=self.delete_product)
+        self.button5.configure(command=self.delete_product)
 
         self.button6 = Button(root)
         self.button6.place(relx=0.135, rely=0.885, width=76, height=23)
@@ -165,7 +166,7 @@ class Inventory:
         self.button6.configure(font="-family {Poppins SemiBold} -size 12")
         self.button6.configure(borderwidth="0")
         self.button6.configure(text="""EXIT""")
-        # self.button6.configure(command=self.Exit)
+        self.button6.configure(command=self.Exit)
 
         self.scrollbarx = Scrollbar(root, orient=HORIZONTAL)
         self.scrollbary = Scrollbar(root, orient=VERTICAL)
@@ -218,11 +219,57 @@ class Inventory:
 
         self.DisplayData()
 
+    def add_product(self):
+        global p_add
+        global page4
+        p_add = Toplevel()
+        page4 = add_product(p_add)
+        p_add.mainloop()
+
+    def delete_product(self):
+        val = []
+        to_delete = []
+
+        if len(self.sel) != 0:
+            sure = messagebox.askyesno("Confirm", "Are you sure you want to delete selected products?", parent=root)
+            if sure == True:
+                for i in self.sel:
+                    for j in self.tree.item(i)["values"]:
+                        val.append(j)
+
+                for j in range(len(val)):
+                    if j % 8 == 0:
+                        to_delete.append(val[j])
+
+                for k in to_delete:
+                    delete = "DELETE FROM raw_inventory WHERE product_id = ?"
+                    cur.execute(delete, [k])
+                    db.commit()
+
+                messagebox.showinfo("Success!!", "Products deleted from database.", parent=root)
+                self.sel.clear()
+                self.tree.delete(*self.tree.get_children())
+
+                self.DisplayData()
+        else:
+            messagebox.showerror("Error!!", "Please select a product.", parent=root)
+
+    def Logout(self):
+        sure = messagebox.askyesno("Logout", "Bạn có muốn đăng xuất?")
+        if sure == True:
+            root.destroy()
+            os.system("./Admin/Login.py")
+
+    def Exit(self):
+        sure = messagebox.askyesno("Exit", "Bạn có chắc chắn muốn thoát không?", parent=root)
+        if sure == True:
+            root.destroy()
+
     def DisplayData(self):
         cur.execute("SELECT * FROM raw_inventory")
         fetch = cur.fetchall()
         for data in fetch:
-            self.tree.insert("", "end", values=(data))
+            self.tree.insert("", "end", values=data)
 
     def search_product(self):
         val = []
@@ -234,7 +281,7 @@ class Inventory:
         try:
             to_search = int(self.entry1.get())
         except ValueError:
-             messagebox.showerror("Oops!!", "Invalid Product Id.", parent=root)
+            messagebox.showerror("Oops!!", "Invalid Product Id.", parent=root)
         else:
             for search in val:
                 if search == to_search:
@@ -245,7 +292,7 @@ class Inventory:
                     break
             else:
                 messagebox.showerror("Oops!!", "Product ID: {} not found.".format(self.entry1.get()),
-                                        parent=root)
+                                     parent=root)
 
     sel = []
 
@@ -255,40 +302,16 @@ class Inventory:
             if i not in self.sel:
                 self.sel.append(i)
 
-        def delete_product(self):
-            val = []
-            to_delete = []
-
-            if len(self.sel) != 0:
-                sure = messagebox.askyesno("Confirm", "Are you sure you want to delete selected products?", parent=root)
-                if sure == True:
-                    for i in self.sel:
-                        for j in self.tree.item(i)["values"]:
-                            val.append(j)
-
-                    for j in range(len(val)):
-                        if j % 8 == 0:
-                            to_delete.append(val[j])
-
-                    for k in to_delete:
-                        delete = "DELETE FROM raw_inventory WHERE product_id = ?"
-                        cur.execute(delete, [k])
-                        db.commit()
-
-                    messagebox.showinfo("Success!!", "Products deleted from database.", parent=root)
-                    self.sel.clear()
-                    self.tree.delete(*self.tree.get_children())
-
-                    self.DisplayData()
-            else:
-                messagebox.showerror("Error!!", "Please select a product.", parent=root)
+    def ex2(self):
+        p_add.destroy()
+        self.tree.delete(*self.tree.get_children())
+        self.DisplayData()
 
     def update_product(self):
         if len(self.sel) == 1:
             global p_update
             p_update = Toplevel()
             page9 = Update_Product(p_update)
-            page9.time()
             p_update.protocol("WM_DELETE_WINDOW", self.ex2)
             global valll
             valll = []
@@ -380,7 +403,7 @@ class add_product:
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""ADD""")
-        # self.button1.configure(command=self.add)
+        self.button1.configure(command=self.add)
 
         self.button2 = Button(p_add)
         self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
@@ -395,61 +418,61 @@ class add_product:
         self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearr)
 
-    # def add(self):
-    #     pqty = self.entry3.get()
-    #     pcat = self.entry2.get()
-    #     pmrp = self.entry4.get()
-    #     pname = self.entry1.get()
-    #     psubcat = self.entry6.get()
-    #     pcp = self.entry7.get()
-    #     pvendor = self.entry8.get()
-    #
-    #     if pname.strip():
-    #         if pcat.strip():
-    #             if psubcat.strip():
-    #                 if pqty:
-    #                     if pcp:
-    #                         try:
-    #                             float(pcp)
-    #                         except ValueError:
-    #                             messagebox.showerror("Oops!", "Invalid cost price.", parent=p_add)
-    #                         else:
-    #                             if pmrp:
-    #                                 try:
-    #                                     float(pmrp)
-    #                                 except ValueError:
-    #                                     messagebox.showerror("Oops!", "Invalid MRP.", parent=p_add)
-    #                                 else:
-    #                                     if valid_phone(pvendor):
-    #                                         with sqlite3.connect("./Database/store.db") as db:
-    #                                             cur = db.cursor()
-    #                                         insert = (
-    #                                             "INSERT INTO raw_inventory(product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES(?,?,?,?,?,?,?)"
-    #                                         )
-    #                                         cur.execute(insert,
-    #                                                     [pname, pcat, psubcat, int(pqty), float(pmrp), float(pcp),
-    #                                                      pvendor])
-    #                                         db.commit()
-    #                                         messagebox.showinfo("Success!!", "Product successfully added in inventory.",
-    #                                                             parent=p_add)
-    #                                         p_add.destroy()
-    #                                         page3.tree.delete(*page3.tree.get_children())
-    #                                         page3.DisplayData()
-    #                                         p_add.destroy()
-    #                                     else:
-    #                                         messagebox.showerror("Oops!", "Invalid phone number.", parent=p_add)
-    #                             else:
-    #                                 messagebox.showerror("Oops!", "Please enter MRP.", parent=p_add)
-    #                     else:
-    #                         messagebox.showerror("Oops!", "Please enter product cost price.", parent=p_add)
-    #                 else:
-    #                     messagebox.showerror("Oops!", "Please enter product quantity.", parent=p_add)
-    #             else:
-    #                 messagebox.showerror("Oops!", "Please enter product sub-category.", parent=p_add)
-    #         else:
-    #             messagebox.showerror("Oops!", "Please enter product category.", parent=p_add)
-    #     else:
-    #         messagebox.showerror("Oops!", "Please enter product name", parent=p_add)
+    def add(self):
+        pqty = self.entry3.get()
+        pcat = self.entry2.get()
+        pmrp = self.entry4.get()
+        pname = self.entry1.get()
+        psubcat = self.entry6.get()
+        pcp = self.entry7.get()
+        pvendor = self.entry8.get()
+
+        if pname.strip():
+            if pcat.strip():
+                if psubcat.strip():
+                    if pqty:
+                        if pcp:
+                            try:
+                                float(pcp)
+                            except ValueError:
+                                messagebox.showerror("Oops!", "Invalid cost price.", parent=p_add)
+                            else:
+                                if pmrp:
+                                    try:
+                                        float(pmrp)
+                                    except ValueError:
+                                        messagebox.showerror("Oops!", "Invalid MRP.", parent=p_add)
+                                    else:
+                                        if valid_phone(pvendor):
+                                            with sqlite3.connect("./Database/store.db") as db:
+                                                cur = db.cursor()
+                                            insert = (
+                                                "INSERT INTO raw_inventory(product_name, product_cat, product_subcat, stock, mrp, cost_price, vendor_phn) VALUES(?,?,?,?,?,?,?)"
+                                            )
+                                            cur.execute(insert,
+                                                        [pname, pcat, psubcat, int(pqty), float(pmrp), float(pcp),
+                                                         pvendor])
+                                            db.commit()
+                                            messagebox.showinfo("Success!!", "Product successfully added in inventory.",
+                                                                parent=p_add)
+                                            p_add.destroy()
+                                            page3.tree.delete(*page3.tree.get_children())
+                                            page3.DisplayData()
+                                            p_add.destroy()
+                                        else:
+                                            messagebox.showerror("Oops!", "Invalid phone number.", parent=p_add)
+                                else:
+                                    messagebox.showerror("Oops!", "Please enter MRP.", parent=p_add)
+                        else:
+                            messagebox.showerror("Oops!", "Please enter product cost price.", parent=p_add)
+                    else:
+                        messagebox.showerror("Oops!", "Please enter product quantity.", parent=p_add)
+                else:
+                    messagebox.showerror("Oops!", "Please enter product sub-category.", parent=p_add)
+            else:
+                messagebox.showerror("Oops!", "Please enter product category.", parent=p_add)
+        else:
+            messagebox.showerror("Oops!", "Please enter product name", parent=p_add)
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -467,10 +490,7 @@ class add_product:
             return True
         return False
 
-    def time(self):
-        string = strftime("%H:%M:%S %p")
-        self.clock.config(text=string)
-        self.clock.after(1000, self.time)
+
 
 
 class Update_Product:
@@ -539,7 +559,7 @@ class Update_Product:
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
         self.button1.configure(text="""UPDATE""")
-        # self.button1.configure(command=self.update)
+        self.button1.configure(command=self.update)
 
         self.button2 = Button(p_update)
         self.button2.place(relx=0.526, rely=0.836, width=86, height=34)
@@ -553,7 +573,6 @@ class Update_Product:
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearr)
-
 
     def update(self):
         pqty = self.entry3.get()
@@ -629,19 +648,11 @@ class Update_Product:
         elif val == "":
             return True
         return False
-    def add_product(self):
-        global p_add
-        global page4
-        p_add = Toplevel()
-        page4 = add_product(p_add)
-        page4.time()
-        p_add.mainloop()
-    def time(self):
-        string = strftime("%H:%M:%S %p")
-        self.clock.config(text=string)
-        self.clock.after(1000, self.time)
+
+
+
 def valid_phone(phn):
-    if re.match(r"[789]\d{9}$", phn):
+    if re.match(r"[0]\d{9}$", phn):  # [0]: bắt đầu bằng số 0, \d: đại diện ký tự từ 0-9, {9}: bắt buộc có 9 ký tự
         return True
     return False
 
