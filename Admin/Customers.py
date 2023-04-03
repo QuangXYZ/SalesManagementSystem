@@ -35,6 +35,7 @@ def create_ctm():
                     img TEXT NULL,
                     discount TEXT NULL,
                     isLoyal BOOLEAN
+                    discount TEXT NULL
                     );''')
 
     # Thêm dữ liệu vào bảng
@@ -49,6 +50,12 @@ def create_ctm():
 # cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
 # print(cur.fetchall())    
     
+        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM001', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM001.png', '10')")
+    conn.execute(
+        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
+    conn.commit()
+    conn.close()
+
 class Customer:
     def __init__(self, top=None):
         top.geometry("1366x768")
@@ -285,6 +292,7 @@ class Customer:
                 page3.checkButton.select()
             else:
                 page3.checkButton.deselect()
+
             e_update.mainloop()
         elif len(self.sel) == 0:
             messagebox.showerror("Error", "Hãy chọn khách hàng cần cập nhất.")
@@ -603,7 +611,7 @@ class Update_Employee:
         self.button2.configure(borderwidth="0")
         self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearr)
-        
+      
         self.checkButton = Checkbutton(e_update)
         self.stateCheck = BooleanVar()
         self.checkButton.place(relx=0.132, rely=0.6, width=200, height=34)
@@ -619,6 +627,7 @@ class Update_Employee:
         edes = self.entry4.get()
         eadd = self.entry5.get()
         epass = self.entry6.get()
+
         eloyal = self.stateCheck.get()
         if eloyal == True:
             eloyal = "TRUE"
@@ -633,9 +642,14 @@ class Update_Employee:
                             if epass:
                                 emp_id = vall[0]
                                 update = (
+
                                     "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ?, isLoyal = ? WHERE ctm_id = ?"
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
+                                    "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ? WHERE ctm_id = ?"
+                                )
+                                cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
+
                                 db.commit()
                                 messagebox.showinfo("Success!!",
                                                     "Employee ID: {} successfully updated in database.".format(emp_id),

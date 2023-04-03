@@ -3,7 +3,6 @@ from tkinter import *
 from tkinter import messagebox
 
 main = Tk()
-
 # Tính toán kích thước và vị trí của cửa sổ giữa màn hình
 width = 1366
 height = 768
@@ -15,27 +14,27 @@ y = (screen_height - height) // 2
 
 main.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 main.title("Ứng dụng quản lý bán hàng")
-main.resizable(0, 0)  # không thay đổi kích thước
+main.resizable(0, 0)
 
 
 def Exit():
-    sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không ?", parent=main) # hộp thoại yesno
+    sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không ?", parent=main)
     if sure == True:
         main.destroy()
 
 
-main.protocol("WM_DELETE_WINDOW", Exit)  # sử lý sự kiện nút thoát
+main.protocol("WM_DELETE_WINDOW", Exit)
 
 
 def emp():
-    main.withdraw()  #ẩn
+    main.withdraw()
     os.system("python ./Employee/Login.py")
-    main.deiconify()  #hiện
+    main.deiconify()
 
 
 def adm():
     main.withdraw()
-    os.system("python admin.py")
+    os.system("python ./Admin/Login.py")
     main.deiconify()
 
 

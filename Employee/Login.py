@@ -31,7 +31,7 @@ def create_emp():
     conn.execute(
         "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP001', 'John Doe', '123456789', 'Hcm', '079202021234', 'bcd', 'abc')")
     conn.execute(
-        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP002', 'qq', '123456789', 'Hcm', '079202021234', '12345', 'abc')")
+        "INSERT INTO employee (emp_id, name, contact_num, address, cccd, password, designation) VALUES ('EMP002', 'q', '123456789', 'Hcm', '079202021234', '12345', 'abc')")
     conn.commit()
     conn.close()
 
@@ -107,4 +107,5 @@ def login(Event=None):
         print("Thất bại")
 
 page1 = login_page(root)
+root.bind("<Return>",login)
 root.mainloop()
