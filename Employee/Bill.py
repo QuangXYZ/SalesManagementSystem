@@ -28,7 +28,7 @@ cust_search_bill = StringVar()
 bill_date = StringVar()
 
 
-with sqlite3.connect("./Database/store.db") as db:
+with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
 
 def random_bill_number(stringLength):
@@ -348,15 +348,15 @@ class bill_window:
             product_name = self.combo3.get()
             if(product_name!=""):
                 product_qty = self.entry4.get()
-                find_mrp = "SELECT mrp, stock FROM raw_inventory WHERE product_name = ?"
+                find_mrp = "SELECT cost_price, stock FROM raw_inventory WHERE product_name = ?"
                 cur.execute(find_mrp, [product_name])
                 results = cur.fetchall()
-                stock = results[0][1]
-                mrp = results[0][0]
+                stock = int(results[0][1])
+                cost_price = int(results[0][0])
                 if product_qty.isdigit()==True:
                     if (stock-int(product_qty))>=0:
-                        sp = mrp*int(product_qty)
-                        item = Item(product_name, mrp, int(product_qty))
+                        sp = cost_price*int(product_qty)
+                        item = Item(product_name, cost_price, int(product_qty))
                         self.cart.add_item(item)
                         self.Scrolledtext1.configure(state="normal")
                         bill_text = "{}\t\t\t\t\t\t{}\t\t\t\t\t   {}\n".format(product_name, product_qty, sp)
@@ -574,7 +574,7 @@ class bill_window:
 
                     
 
-                    with sqlite3.connect("./Database/store.db") as db:
+                    with sqlite3.connect("./Database/database.db") as db:
                         cur = db.cursor()
                     insert = (
                         "INSERT INTO bill(bill_no, date, customer_name, customer_no, bill_details) VALUES(?,?,?,?,?)"
