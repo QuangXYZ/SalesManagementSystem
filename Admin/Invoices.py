@@ -21,9 +21,29 @@ y = (screen_height - height) // 2
 root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
 root.title("Invoices")
 
-with sqlite3.connect("./Database/store.db") as db:
+with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
 
+
+def create_ctm():
+    conn = sqlite3.connect('./Database/database.db')
+
+    # Tạo bảng trong cơ sở dữ liệu
+    conn.execute('''CREATE TABLE bill
+                    (bill_no TEXT PRIMARY KEY NOT NULL,
+                    date TEXT NOT NULL,
+                    customer_name TEXT NULL,
+                    customer_no TEXT NULL,
+                    bill_details TEXT NULL          
+                    );''')
+
+    # Thêm dữ liệu vào bảng
+    conn.execute(
+        "INSERT INTO bill(bill_no, date, customer_name, customer_no, bill_details) VALUES('BB000001','1/1/2023','Quang','CTM001','Test bill')")
+    conn.commit()
+    conn.close()
+
+create_ctm()
 def invoices():
     global invoice
     invoice = Toplevel()
