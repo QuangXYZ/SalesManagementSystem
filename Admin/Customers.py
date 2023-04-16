@@ -49,12 +49,11 @@ def create_ctm():
 # create_ctm()
 # cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
 # print(cur.fetchall())    
-    
-        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM001', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM001.png', '10')")
-    conn.execute(
-        "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
-    conn.commit()
-    conn.close()
+    # conn.execute(
+    #     "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
+    # conn.commit()
+    # conn.close()
+
 
 class Customer:
     def __init__(self, top=None):
@@ -646,8 +645,7 @@ class Update_Employee:
                                     "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ?, isLoyal = ? WHERE ctm_id = ?"
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
-                                    "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ? WHERE ctm_id = ?"
-                                )
+                                
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
 
                                 db.commit()
