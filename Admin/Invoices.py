@@ -94,7 +94,7 @@ class Invoice:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 10")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""Search""")
+        self.button1.configure(text="""Tìm""")
         self.button1.configure(command=self.search_inv)
         # ==================================================
         self.button2 = Button(root)
@@ -120,7 +120,7 @@ class Invoice:
         self.button3.configure(background="#CF1E14")
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
-        self.button3.configure(text="""DELETE INVOICE""")
+        self.button3.configure(text="""XÓA HÓA ĐƠN""")
         self.button3.configure(command=self.delete_invoice)
         #===================================
         self.button4 = Button(root)
