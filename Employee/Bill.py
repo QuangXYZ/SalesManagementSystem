@@ -168,7 +168,7 @@ class bill_window:
         self.button3.configure(font="-family {Poppins SemiBold} -size 10")
         self.button3.configure(borderwidth="0")
         self.button3.configure(text="""Total""")
-        self.button3.configure(command=self.total_bill)
+        self.button3.configure(command=lambda: self.total_bill(0))
 
         self.button4 = Button(bill_root)
         self.button4.place(relx=0.141, rely=0.885, width=84, height=25)

@@ -8,7 +8,6 @@ from tkinter import messagebox
 from tkinter import ttk
 import cv2
 
-
 root = Tk()
 width = 1366
 height = 768
@@ -45,11 +44,16 @@ def create_ctm():
         "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount,isLoyal) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10','FALSE')")
     conn.commit()
     conn.close()
-# cur.execute("drop table Customer")
-# create_ctm()
-# cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
-# print(cur.fetchall())
 
+
+cur.execute("drop table Customer")
+create_ctm()
+# cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
+# print(cur.fetchall())    
+# conn.execute(
+#     "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
+# conn.commit()
+# conn.close()
 
 
 class Customer:
@@ -188,13 +192,13 @@ class Customer:
             )
         )
 
-        self.tree.heading("Customer ID", text="ID Khách hàng", anchor=W)
-        self.tree.heading("Customer Name", text="Tên khách hàng", anchor=W)
-        self.tree.heading("Contact No.", text="Số điện thoại.", anchor=W)
-        self.tree.heading("Address", text="Địa chỉ", anchor=W)
+        self.tree.heading("Customer ID", text="Customer ID", anchor=W)
+        self.tree.heading("Customer Name", text="Customer Name", anchor=W)
+        self.tree.heading("Contact No.", text="Contact No.", anchor=W)
+        self.tree.heading("Address", text="Address", anchor=W)
         self.tree.heading("Cccd", text="CCCD No.", anchor=W)
-        self.tree.heading("Image", text="Ảnh", anchor=W)
-        self.tree.heading("Discount", text="Mức giảm giá (%)", anchor=W)
+        self.tree.heading("Image", text="Image", anchor=W)
+        self.tree.heading("Discount", text="Discount", anchor=W)
 
         self.tree.column("#0", stretch=NO, minwidth=0, width=0)
         self.tree.column("#1", stretch=NO, minwidth=0, width=80)
@@ -208,20 +212,24 @@ class Customer:
         self.DisplayData()
 
     sel = []
+
     def DisplayData(self):
         cur.execute("SELECT * FROM Customer")
         fetch = cur.fetchall()
         for data in fetch:
             self.tree.insert("", "end", values=(data))
+
     def on_tree_select(self, Event):
         self.sel.clear()
         for i in self.tree.selection():
             if i not in self.sel:
                 self.sel.append(i)
+
     def Exit(self):
-        sure = messagebox.askyesno("Exit","Bạn có muốn thoát không", parent=root)
+        sure = messagebox.askyesno("Exit", "Are you sure you want to exit?", parent=root)
         if sure == True:
             root.destroy()
+
     def add_emp(self):
         global e_add
         global emp_id
@@ -245,11 +253,10 @@ class Customer:
             if search == to_search:
                 self.tree.selection_set(val[val.index(search) - 1])
                 self.tree.focus(val[val.index(search) - 1])
-                messagebox.showinfo("Success!!", "Đã tìm thấy khách hàng : {} .".format(self.entry1.get()), parent=root)
+                messagebox.showinfo("Success!!", "Customer ID: {} found.".format(self.entry1.get()), parent=root)
                 break
         else:
-            messagebox.showerror("Oops!!", "Không tìm thấy khách hàng {}.".format(self.entry1.get()), parent=root)
-
+            messagebox.showerror("Oops!!", "Customer ID: {} not found.".format(self.entry1.get()), parent=root)
 
     def ex(self):  # thoát screen thêm kh
         e_add.destroy()
@@ -277,14 +284,14 @@ class Customer:
                 for j in self.tree.item(i)["values"]:
                     vall.append(j)
             page3.entry1.insert(0, vall[1])
-            page3.entry2.insert(0, "0"+str(vall[2]))
-            page3.entry3.insert(0, "0"+str(vall[4]))
+            page3.entry2.insert(0, vall[2])
+            page3.entry3.insert(0, vall[4])
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
             page3.entry6.configure(state='normal')
             page3.entry6.insert(0, vall[5])
             page3.entry6.configure(state='disabled')
-            if(vall[7] == 'TRUE'):
+            if (vall[7] == 'TRUE'):
                 page3.checkButton.select()
             else:
                 page3.checkButton.deselect()
@@ -296,7 +303,7 @@ class Customer:
             messagebox.showerror("Error", "Chỉ có thể cập nhật 1 khách hàng mỗi lần .")
 
     def exUpdate(self):
-        sure = messagebox.askyesno("Exit","Bạn có muốn thoát không?", parent=e_update)
+        sure = messagebox.askyesno("Exit", "Bạn có muốn thoát không?", parent=e_update)
         if sure == True:
             e_update.destroy()
 
@@ -343,7 +350,6 @@ class add_employee:
         top.geometry("1366x768")
         top.resizable(0, 0)
         top.title("Thêm khách hàng")
-
 
         self.label1 = Label(e_add)
         self.label1.place(relx=0, rely=0, width=1366, height=768)
@@ -416,7 +422,7 @@ class add_employee:
         self.button1.configure(background="#CF1E14")
         self.button1.configure(font="-family {Poppins SemiBold} -size 14")
         self.button1.configure(borderwidth="0")
-        self.button1.configure(text="""Thêm""")
+        self.button1.configure(text="""ADD""")
         self.button1.configure(command=self.addCustomer)
 
         self.button2 = Button(e_add)
@@ -429,9 +435,8 @@ class add_employee:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""Xóa""")
+        self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearForm)
-
 
     def clearForm(self):
         self.entry1.delete(0, END)
@@ -456,26 +461,27 @@ class add_employee:
                         if eadd:
                             if epass:
 
-
                                 insert = (
-                                            "INSERT INTO Customer(ctm_id, name, contact_num, address, cccd, img, discount) VALUES(?,?,?,?,?,?,?)"
-                                        )
+                                    "INSERT INTO Customer(ctm_id, name, contact_num, address, cccd, img, discount) VALUES(?,?,?,?,?,?,?)"
+                                )
                                 cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
                                 db.commit()
-                                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã được thêm thành công.".format(emp_id), parent=e_add)
+                                messagebox.showinfo("Success!!",
+                                                    "Employee ID: {} successfully added in database.".format(emp_id),
+                                                    parent=e_add)
                                 self.clearForm()
                             else:
-                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_add)
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
                         else:
-                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_add)
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
                     else:
-                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_add)
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
                 else:
-                    messagebox.showerror("Oops!", "Chưa điền số CCCD.", parent=e_add)
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
             else:
-                messagebox.showerror("Oops!", "Chưa điền số điện thoại.", parent=e_add)
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
         else:
-            messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=e_add)
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
 
     def testint(self, val):
         if val.isdigit():
@@ -490,29 +496,31 @@ class add_employee:
         elif val == "":
             return True
         return False
+
     def takePhoto(self):
         # Initialize camera object
-        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
-        # Capture a frame from camera
+            # Capture a frame from camera
             ret, frame = cap.read()
             if not ret:
                 break
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
             cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
-            if cv2.waitKey(1) == ord('q') :
+            if cv2.waitKey(1) == ord('q'):
                 # Save the captured frame to file
                 path = "Images/Face_customer/" + emp_id + ".png"
                 cv2.imwrite(path, frame)
                 self.entry6.configure(state='normal')
                 self.entry6.delete(0, "end")
-                self.entry6.insert(0,path)
+                self.entry6.insert(0, path)
                 self.entry6.configure(state='disabled')
                 break
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
+
 
 # màn hình update khách hàng
 class Update_Employee:
@@ -638,13 +646,16 @@ class Update_Employee:
                             if epass:
                                 emp_id = vall[0]
                                 update = (
+
                                     "UPDATE Customer SET name = ?, contact_num = ?, address = ?, cccd = ?, img = ?, discount = ?, isLoyal = ? WHERE ctm_id = ?"
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
 
+                                cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
+
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Khách hàng ID: {} đã cập nhật thành công .".format(emp_id),
+                                                    "Employee ID: {} successfully updated in database.".format(emp_id),
                                                     parent=e_update)
                                 vall.clear()
                                 page1.tree.delete(*page1.tree.get_children())
@@ -652,36 +663,36 @@ class Update_Employee:
                                 Customer.sel.clear()
                                 e_update.destroy()
                             else:
-                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_update)
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_update)
                         else:
-                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_update)
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_update)
                     else:
-                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_update)
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_update)
                 else:
-                    messagebox.showerror("Oops!", "Số CCCD không hợp lệ.", parent=e_update)
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_update)
             else:
-                messagebox.showerror("Oops!", "Số điện thoại không hợp lệ", parent=e_update)
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
         else:
-            messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=e_update)
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
 
     def takePhoto(self):
         # Initialize camera object
-        cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
-        # Capture a frame from camera
+            # Capture a frame from camera
             ret, frame = cap.read()
             if not ret:
                 break
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
             cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
-            if cv2.waitKey(1) == ord('q') :
+            if cv2.waitKey(1) == ord('q'):
                 # Save the captured frame to file
                 path = "Images/Face_customer/" + vall[0] + ".png"
                 cv2.imwrite(path, frame)
                 self.entry6.configure(state='normal')
                 self.entry6.delete(0, "end")
-                self.entry6.insert(0,path)
+                self.entry6.insert(0, path)
                 self.entry6.configure(state='disabled')
                 break
         # Release camera object
@@ -711,20 +722,23 @@ class Update_Employee:
         return False
 
 
-
 def valid_phone(phn):
     if re.match(r"[0]\d{9}$", phn):
         return True
     return False
 
+
 def valid_cccd(aad):
-    if aad.isdigit() and len(aad)==12:
+    if aad.isdigit() and len(aad) == 12:
         return True
     return False
+
+
 def random_emp_id(stringLength):
     Digits = string.digits
-    strr=''.join(random.choice(Digits) for i in range(stringLength-3))
-    return ('CTM'+strr)
+    strr = ''.join(random.choice(Digits) for i in range(stringLength - 3))
+    return ('CTM' + strr)
+
 
 page1 = Customer(root)
 root.mainloop()
