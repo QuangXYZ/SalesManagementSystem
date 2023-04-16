@@ -43,7 +43,7 @@ def create_ctm():
     conn.commit()
     conn.close()
 
-create_ctm()
+
 def invoices():
     global invoice
     invoice = Toplevel()
