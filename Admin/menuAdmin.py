@@ -56,7 +56,7 @@ class Admin_Page:
         self.button2.configure(background="#ffffff")
         self.button2.configure(font="-family {Poppins SemiBold} -size 12")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""Inventory""")
+        self.button2.configure(text="""Sản phẩm""")
         self.button2.configure(command=self.Inventory)
 
         self.button3 = Button(root)
@@ -69,7 +69,7 @@ class Admin_Page:
         self.button3.configure(background="#ffffff")
         self.button3.configure(font="-family {Poppins SemiBold} -size 12")
         self.button3.configure(borderwidth="0")
-        self.button3.configure(text="""Employees""")
+        self.button3.configure(text="""Nhân viên""")
         self.button3.configure(command=self.Employee)
 
         self.button4 = Button(root)
@@ -82,7 +82,7 @@ class Admin_Page:
         self.button4.configure(background="#ffffff")
         self.button4.configure(font="-family {Poppins SemiBold} -size 12")
         self.button4.configure(borderwidth="0")
-        self.button4.configure(text="""Invoices""")
+        self.button4.configure(text="""Hóa đơn""")
         self.button4.configure(command=self.Invoices)
 
         self.button5 = Button(root)
@@ -95,11 +95,11 @@ class Admin_Page:
         self.button5.configure(background="#ffffff")
         self.button5.configure(font="-family {Poppins SemiBold} -size 12")
         self.button5.configure(borderwidth="0")
-        self.button5.configure(text="""Customers""")
+        self.button5.configure(text="""Khách hàng""")
         self.button5.configure(command=self.Customer)
 
     def Logout(self):
-        sure = messagebox.askyesno("Logout", "Are you sure you want to logout?", parent=root)
+        sure = messagebox.askyesno("Logout", "Bạn có chắc chắn đăng xuất?", parent=root)
         if sure == True:
             root.destroy()
 
