@@ -352,7 +352,7 @@ class bill_window:
                 cur.execute(find_mrp, [product_name])
                 results = cur.fetchall()
                 stock = int(results[0][1])
-                cost_price = int(results[0][0])
+                cost_price = float(results[0][0])
                 if product_qty.isdigit()==True:
                     if (stock-int(product_qty))>=0:
                         sp = cost_price*int(product_qty)
