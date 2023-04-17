@@ -7,7 +7,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 import cv2
-
+import time
 root = Tk()
 width = 1366
 height = 768
@@ -253,7 +253,8 @@ class Customer:
             if search == to_search:
                 self.tree.selection_set(val[val.index(search) - 1])
                 self.tree.focus(val[val.index(search) - 1])
-                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã tìm thấy.".format(self.entry1.get()), parent=root)
+                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã tìm thấy.".format(self.entry1.get()),
+                                    parent=root)
                 break
         else:
             messagebox.showerror("Oops!!", "khách hàng ID: {} không tìm thấy.".format(self.entry1.get()), parent=root)
@@ -498,28 +499,35 @@ class add_employee:
         return False
 
     def takePhoto(self):
+        os.makedirs("Images/Face_customer/" + emp_id)
         # Initialize camera object
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        i =1;
         while True:
+
             # Capture a frame from camera
             ret, frame = cap.read()
             if not ret:
                 break
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
-            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
-            if cv2.waitKey(1) == ord('q'):
+            cv2.imshow('Wait 5 second', flip_frame)
                 # Save the captured frame to file
-                path = "Images/Face_customer/" + emp_id + ".png"
-                cv2.imwrite(path, frame)
-                self.entry6.configure(state='normal')
-                self.entry6.delete(0, "end")
-                self.entry6.insert(0, path)
-                self.entry6.configure(state='disabled')
-                break
+            path = "Images/Face_customer/" +emp_id+"/"+ emp_id+"-"+str(i)+ ".png"
+            cv2.imwrite(path, frame)
+
+            if i == 20: break
+            i+=1
+            time.sleep(0.25)
+
+
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
+        self.entry6.configure(state='normal')
+        self.entry6.delete(0, "end")
+        self.entry6.insert(0, "Images/Face_customer/" + emp_id)
+        self.entry6.configure(state='disabled')
 
 
 # màn hình update khách hàng
@@ -651,7 +659,6 @@ class Update_Employee:
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
 
-
                                 db.commit()
                                 messagebox.showinfo("Success!!",
                                                     "Khách hàng ID: {} đã cập nhật thành công.".format(emp_id),
@@ -675,8 +682,10 @@ class Update_Employee:
             messagebox.showerror("Oops!", "Chưa điền tên nhân viên.", parent=e_update)
 
     def takePhoto(self):
+
         # Initialize camera object
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        i =0
         while True:
             # Capture a frame from camera
             ret, frame = cap.read()
@@ -684,19 +693,20 @@ class Update_Employee:
                 break
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
-            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
-            if cv2.waitKey(1) == ord('q'):
-                # Save the captured frame to file
-                path = "Images/Face_customer/" + vall[0] + ".png"
-                cv2.imwrite(path, frame)
-                self.entry6.configure(state='normal')
-                self.entry6.delete(0, "end")
-                self.entry6.insert(0, path)
-                self.entry6.configure(state='disabled')
-                break
+            cv2.imshow('Wait 5 second', flip_frame)
+
+            # Save the captured frame to file
+            path = "Images/Face_customer/" + vall[0]+"/"+vall[0]+"-"+str(i) + ".png"
+            cv2.imwrite(path, frame)
+            i+=1
+            if i == 20 : break
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
+        self.entry6.configure(state='normal')
+        self.entry6.delete(0, "end")
+        self.entry6.insert(0, "Images/Face_customer/" + vall[0])
+        self.entry6.configure(state='disabled')
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -737,6 +747,7 @@ def random_emp_id(stringLength):
     Digits = string.digits
     strr = ''.join(random.choice(Digits) for i in range(stringLength - 3))
     return ('CTM' + strr)
+
 
 
 page1 = Customer(root)
