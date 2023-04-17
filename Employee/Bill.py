@@ -37,7 +37,7 @@ def random_bill_number(stringLength):
     return ('BB'+strr)
 
 def logout():
-    sure = messagebox.askyesno("Logout", "Are you sure you want to logout?", parent=bill_root)
+    sure = messagebox.askyesno("Logout", "Bạn có chắc muốn thoát?", parent=bill_root)
     if sure == True:
         bill_root.destroy()
         os.system("python ./Employee/Login.py")
@@ -81,7 +81,7 @@ class Cart:
     
 
 def exitt():
-    sure = messagebox.askyesno("Exit","Are you sure you want to exit?", parent=bill_root)
+    sure = messagebox.askyesno("Exit","Bạn có chắc muốn thoát?", parent=bill_root)
     if sure == True:
         bill_root.destroy()
         
@@ -363,11 +363,11 @@ class bill_window:
                         self.Scrolledtext1.insert('insert', bill_text)
                         self.Scrolledtext1.configure(state="disabled")
                     else:
-                        messagebox.showerror("Oops!", "Out of stock. Check quantity.", parent=bill_root)
+                        messagebox.showerror("Oops!", "Hết hàng.", parent=bill_root)
                 else:
-                    messagebox.showerror("Oops!", "Invalid quantity.", parent=bill_root)
+                    messagebox.showerror("Oops!", "Chưa điền số lượng.", parent=bill_root)
             else:
-                messagebox.showerror("Oops!", "Choose a product.", parent=bill_root)
+                messagebox.showerror("Oops!", "Chưa chọn sản phẩm.", parent=bill_root)
         else:
             self.Scrolledtext1.delete('1.0', END)
             new_li = []
@@ -399,11 +399,11 @@ class bill_window:
                         self.Scrolledtext1.insert('insert', bill_text)
                         self.Scrolledtext1.configure(state="disabled")
                     else:
-                        messagebox.showerror("Oops!", "Out of stock. Check quantity.", parent=bill_root)
+                        messagebox.showerror("Oops!", "Hết hàng.", parent=bill_root)
                 else:
-                    messagebox.showerror("Oops!", "Invalid quantity.", parent=bill_root)
+                    messagebox.showerror("Oops!", "Chưa điền số lượng.", parent=bill_root)
             else:
-                messagebox.showerror("Oops!", "Choose a product.", parent=bill_root)
+                messagebox.showerror("Oops!", "Chưa chọn số lượng.", parent=bill_root)
     
     def remove_product(self):
         if(self.cart.isEmpty()!=True):
@@ -413,7 +413,7 @@ class bill_window:
                 try:
                     self.cart.remove_item()
                 except IndexError:
-                    messagebox.showerror("Oops!", "Cart is empty", parent=bill_root)
+                    messagebox.showerror("Oops!", "Chưa có sản phẩm", parent=bill_root)
                 else:
                     self.Scrolledtext1.configure(state="normal")
                     get_all_bill = (self.Scrolledtext1.get('1.0', END).split("\n"))
@@ -428,7 +428,7 @@ class bill_window:
                 try:
                     self.cart.remove_item()
                 except IndexError:
-                    messagebox.showerror("Oops!", "Cart is empty", parent=bill_root)
+                    messagebox.showerror("Oops!", "Chưa có sản phẩm", parent=bill_root)
                 else:
                     self.Scrolledtext1.delete('1.0', END)
                     new_li = []
@@ -446,7 +446,7 @@ class bill_window:
                     self.Scrolledtext1.configure(state="disabled")
 
         else:
-            messagebox.showerror("Oops!", "Add a product.", parent=bill_root)
+            messagebox.showerror("Oops!", "Chưa có sản phẩm.", parent=bill_root)
 
     def wel_bill(self):
         self.name_message = Text(bill_root)
@@ -475,7 +475,7 @@ class bill_window:
     
     def total_bill(self, discount):
         if self.cart.isEmpty():
-            messagebox.showerror("Oops!", "Add a product.", parent=bill_root)
+            messagebox.showerror("Oops!", "Chưa có sản phẩm.", parent=bill_root)
         else:
             self.Scrolledtext1.configure(state="normal")
             strr = self.Scrolledtext1.get('1.0', END)
@@ -517,6 +517,7 @@ class bill_window:
                 curCus.execute(f"SELECT discount from Customer WHERE ctm_id='{idCus}'")
                 self.discount = int(curCus.fetchall()[0][0])
                 self.entry1.insert(0,name[0])
+
             windowChooseTypeOfCus.destroy()
             
         button1 = Button(windowChooseTypeOfCus)
@@ -544,7 +545,7 @@ class bill_window:
             strr = self.Scrolledtext1.get('1.0', END)
             self.wel_bill()
             if(cust_name.get()==""):
-                messagebox.showerror("Oops!", "Please enter a name.", parent=bill_root)
+                messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=bill_root)
             # elif(cust_num.get()==""):
             #     messagebox.showerror("Oops!", "Please enter a number.", parent=bill_root)
             # elif valid_phone(cust_num.get())==False:
@@ -664,7 +665,7 @@ class bill_window:
             self.state = 0
 
         else:
-            messagebox.showerror("Error!!", "Bill not found.", parent=bill_root)
+            messagebox.showerror("Error!!", "Không tìm thấy hóa đơn này.", parent=bill_root)
             self.entry3.delete(0, END)
             
     def time(self):

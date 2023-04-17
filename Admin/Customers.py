@@ -226,7 +226,7 @@ class Customer:
                 self.sel.append(i)
 
     def Exit(self):
-        sure = messagebox.askyesno("Exit", "Are you sure you want to exit?", parent=root)
+        sure = messagebox.askyesno("Exit", "Bạn có chắc muốn thoát ?", parent=root)
         if sure == True:
             root.destroy()
 
@@ -253,10 +253,10 @@ class Customer:
             if search == to_search:
                 self.tree.selection_set(val[val.index(search) - 1])
                 self.tree.focus(val[val.index(search) - 1])
-                messagebox.showinfo("Success!!", "Customer ID: {} found.".format(self.entry1.get()), parent=root)
+                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã tìm thấy.".format(self.entry1.get()), parent=root)
                 break
         else:
-            messagebox.showerror("Oops!!", "Customer ID: {} not found.".format(self.entry1.get()), parent=root)
+            messagebox.showerror("Oops!!", "khách hàng ID: {} không tìm thấy.".format(self.entry1.get()), parent=root)
 
     def ex(self):  # thoát screen thêm kh
         e_add.destroy()
@@ -467,21 +467,21 @@ class add_employee:
                                 cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Employee ID: {} successfully added in database.".format(emp_id),
+                                                    "Khách hàng ID: {} đã thêm thành công.".format(emp_id),
                                                     parent=e_add)
                                 self.clearForm()
                             else:
-                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_add)
+                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_add)
                         else:
-                            messagebox.showerror("Oops!", "Please enter address.", parent=e_add)
+                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_add)
                     else:
-                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_add)
+                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_add)
                 else:
-                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_add)
+                    messagebox.showerror("Oops!", "Số căn cước chưa đúng.", parent=e_add)
             else:
-                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_add)
+                messagebox.showerror("Oops!", "Số điện thoại chưa đúng.", parent=e_add)
         else:
-            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_add)
+            messagebox.showerror("Oops!", "Chưa điền tên nhân viên.", parent=e_add)
 
     def testint(self, val):
         if val.isdigit():
@@ -613,7 +613,7 @@ class Update_Employee:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""CLEAR""")
+        self.button2.configure(text="""XÓA""")
         self.button2.configure(command=self.clearr)
 
         self.checkButton = Checkbutton(e_update)
@@ -651,11 +651,10 @@ class Update_Employee:
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
 
-                                cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, emp_id])
 
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Employee ID: {} successfully updated in database.".format(emp_id),
+                                                    "Khách hàng ID: {} đã cập nhật thành công.".format(emp_id),
                                                     parent=e_update)
                                 vall.clear()
                                 page1.tree.delete(*page1.tree.get_children())
@@ -663,17 +662,17 @@ class Update_Employee:
                                 Customer.sel.clear()
                                 e_update.destroy()
                             else:
-                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_update)
+                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_update)
                         else:
-                            messagebox.showerror("Oops!", "Please enter address.", parent=e_update)
+                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_update)
                     else:
-                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_update)
+                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_update)
                 else:
-                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_update)
+                    messagebox.showerror("Oops!", "Số căn cước chưa đúng.", parent=e_update)
             else:
-                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
+                messagebox.showerror("Oops!", "Số điện thoại chưa đúng.", parent=e_update)
         else:
-            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
+            messagebox.showerror("Oops!", "Chưa điền tên nhân viên.", parent=e_update)
 
     def takePhoto(self):
         # Initialize camera object
