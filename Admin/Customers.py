@@ -685,7 +685,7 @@ class Update_Employee:
 
         # Initialize camera object
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        i =0
+        i =1
         while True:
             # Capture a frame from camera
             ret, frame = cap.read()
@@ -694,7 +694,6 @@ class Update_Employee:
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
             cv2.imshow('Wait 5 second', flip_frame)
-
             # Save the captured frame to file
             path = "Images/Face_customer/" + vall[0]+"/"+vall[0]+"-"+str(i) + ".png"
             cv2.imwrite(path, frame)
