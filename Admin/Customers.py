@@ -699,6 +699,7 @@ class Update_Employee:
             cv2.imwrite(path, frame)
             i+=1
             if i == 20 : break
+            time.sleep(0.25)
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
