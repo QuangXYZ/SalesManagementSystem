@@ -505,7 +505,7 @@ class bill_window:
                 curCus = db.cursor()
             
             self.entry1.delete(0,END)
-            idCus = faceRecog.FaceRecognition().run_recognition().split(".")[0]
+            idCus = faceRecog.faceRecognition()
             curCus.execute(f"SELECT isLoyal from Customer WHERE ctm_id='{idCus}'")
             listCusIDImg =curCus.fetchall()[0]
             if idCus == "Unknown":

@@ -494,6 +494,7 @@ class add_employee:
             return True
         return False
     def takePhoto(self):
+<<<<<<< Updated upstream
         # Initialize camera object
         cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
         while True:
@@ -513,7 +514,46 @@ class add_employee:
                 self.entry6.insert(0,path)
                 self.entry6.configure(state='disabled')
                 break
+=======
+        path = "Images/Face_customer/" + emp_id
+        
+        os.makedirs(path)
+        # Initialize camera object
+        cap = cv2.VideoCapture(0)
+        i =1
+        face_cascade = cv2.CascadeClassifier('..\SalesManagementSystem - Copy\Employee\cascade\data\haarcascade_frontalface_alt2.xml')
+        
+        while True:
+            ret,frame = cap.read()
+            
+            gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray,scaleFactor=1.5,minNeighbors=5)
+            
+            for (x,y,w,h) in faces:
+                image_item = os.path.join(path,f'{emp_id}_{i}.png')
+                cv2.imwrite(image_item,frame)
+                i+=1
+                color = (255,0,0)
+                stroke =2
+                endcord_x = x + w
+                endcord_y = y + h
+                cv2.rectangle(frame,(x,y),(endcord_x,endcord_y),color,stroke)
+            
+            cv2.imshow('Capture',frame)
+            
+            if cv2.waitKey(20) & 0xFF == ord('q'): break
+            
+            if i == 20: break
+
+>>>>>>> Stashed changes
         # Release camera object
+        import sys
+        sys.path.insert(1,'E:\Python\SalesManagementSystem - Copy\Employee')
+        import faceTrain as faceTrainning
+        
+        faceTrainning.faceTrain(path).trainning()
+        
+        
         cap.release()
         cv2.destroyAllWindows()
 
@@ -670,6 +710,7 @@ class Update_Employee:
         else:
             messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
 
+<<<<<<< Updated upstream
     def takePhoto(self):
         # Initialize camera object
         cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
@@ -693,6 +734,34 @@ class Update_Employee:
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
+=======
+    # def takePhoto(self):
+
+    #     # Initialize camera object
+    #     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    #     i =1
+    #     while True:
+    #         # Capture a frame from camera
+    #         ret, frame = cap.read()
+    #         if not ret:
+    #             break
+    #         # Lật ngược chiều dọc
+    #         flip_frame = cv2.flip(frame, 1)
+    #         cv2.imshow('Wait 5 second', flip_frame)
+    #         # Save the captured frame to file
+    #         path = "Images/Face_customer/" + vall[0]+"/"+vall[0]+"-"+str(i) + ".png"
+    #         cv2.imwrite(path, frame)
+    #         i+=1
+    #         if i == 20 : break
+    #         time.sleep(0.25)
+    #     # Release camera object
+    #     cap.release()
+    #     cv2.destroyAllWindows()
+    #     self.entry6.configure(state='normal')
+    #     self.entry6.delete(0, "end")
+    #     self.entry6.insert(0, "Images/Face_customer/" + vall[0])
+    #     self.entry6.configure(state='disabled')
+>>>>>>> Stashed changes
 
     def clearr(self):
         self.entry1.delete(0, END)
