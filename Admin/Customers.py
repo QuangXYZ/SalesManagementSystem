@@ -7,7 +7,8 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 import cv2
-import time
+import Employee.faceTrain as faceTrainning
+
 root = Tk()
 width = 1366
 height = 768
@@ -47,9 +48,9 @@ def create_ctm():
 
 
 # cur.execute("drop table Customer")
-# create_ctm(
+# create_ctm()
 # cur.execute("SELECT isLoyal from Customer where ctm_id='CTM001'")
-# print(cur.fetchall())    
+# print(cur.fetchall())
 # conn.execute(
 #     "INSERT INTO Customer (ctm_id, name, contact_num, address, cccd, img, discount) VALUES ('CTM002', 'John Doe', '123456789', 'Hcm', '079202021234', 'CTM002.png', '10')")
 # conn.commit()
@@ -226,7 +227,7 @@ class Customer:
                 self.sel.append(i)
 
     def Exit(self):
-        sure = messagebox.askyesno("Exit", "Bạn có chắc muốn thoát ?", parent=root)
+        sure = messagebox.askyesno("Exit", "Bạn có muốn thoát?", parent=root)
         if sure == True:
             root.destroy()
 
@@ -253,11 +254,10 @@ class Customer:
             if search == to_search:
                 self.tree.selection_set(val[val.index(search) - 1])
                 self.tree.focus(val[val.index(search) - 1])
-                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã tìm thấy.".format(self.entry1.get()),
-                                    parent=root)
+                messagebox.showinfo("Success!!", "Khách hàng ID: {} đã tìm thấy.".format(self.entry1.get()), parent=root)
                 break
         else:
-            messagebox.showerror("Oops!!", "khách hàng ID: {} không tìm thấy.".format(self.entry1.get()), parent=root)
+            messagebox.showerror("Oops!!", "Khách hàng ID: {} không tìm thấy.".format(self.entry1.get()), parent=root)
 
     def ex(self):  # thoát screen thêm kh
         e_add.destroy()
@@ -285,8 +285,8 @@ class Customer:
                 for j in self.tree.item(i)["values"]:
                     vall.append(j)
             page3.entry1.insert(0, vall[1])
-            page3.entry2.insert(0, vall[2])
-            page3.entry3.insert(0, vall[4])
+            page3.entry2.insert(0, '0'+ str(vall[2]))
+            page3.entry3.insert(0, '0'+ str(vall[4]))
             page3.entry4.insert(0, vall[6])
             page3.entry5.insert(0, vall[3])
             page3.entry6.configure(state='normal')
@@ -468,7 +468,7 @@ class add_employee:
                                 cur.execute(insert, [emp_id, ename, econtact, eadd, eaddhar, epass, edes])
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Khách hàng ID: {} đã thêm thành công.".format(emp_id),
+                                                    "Employee ID: {} successfully added in database.".format(emp_id),
                                                     parent=e_add)
                                 self.clearForm()
                             else:
@@ -476,13 +476,13 @@ class add_employee:
                         else:
                             messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_add)
                     else:
-                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_add)
+                        messagebox.showerror("Oops!", "Chưa điền giảm giá.", parent=e_add)
                 else:
-                    messagebox.showerror("Oops!", "Số căn cước chưa đúng.", parent=e_add)
+                    messagebox.showerror("Oops!", "Số cccd không hợp lệ", parent=e_add)
             else:
-                messagebox.showerror("Oops!", "Số điện thoại chưa đúng.", parent=e_add)
+                messagebox.showerror("Oops!", "Số điện thoại không hợp lệ.", parent=e_add)
         else:
-            messagebox.showerror("Oops!", "Chưa điền tên nhân viên.", parent=e_add)
+            messagebox.showerror("Oops!", "Chưa điền tên khách hàng", parent=e_add)
 
     def testint(self, val):
         if val.isdigit():
@@ -499,35 +499,50 @@ class add_employee:
         return False
 
     def takePhoto(self):
-        os.makedirs("Images/Face_customer/" + emp_id)
-        # Initialize camera object
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        i =1;
-        while True:
+        path = "Images/Face_customer/" + emp_id
 
-            # Capture a frame from camera
+        os.makedirs(path)
+        # Initialize camera object
+        cap = cv2.VideoCapture(0)
+        i = 1
+        face_cascade = cv2.CascadeClassifier(
+            '.\Employee\cascade\data\haarcascade_frontalface_default.xml')
+
+        while True:
             ret, frame = cap.read()
-            if not ret:
-                break
-            # Lật ngược chiều dọc
-            flip_frame = cv2.flip(frame, 1)
-            cv2.imshow('Wait 5 second', flip_frame)
-                # Save the captured frame to file
-            path = "Images/Face_customer/" +emp_id+"/"+ emp_id+"-"+str(i)+ ".png"
-            cv2.imwrite(path, frame)
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+
+            for (x, y, w, h) in faces:
+                image_item = os.path.join(path, f'{emp_id}_{i}.png')
+                cv2.imwrite(image_item, frame)
+                i += 1
+                color = (255, 0, 0)
+                stroke = 2
+                endcord_x = x + w
+                endcord_y = y + h
+                cv2.rectangle(frame, (x, y), (endcord_x, endcord_y), color, stroke)
+
+            cv2.imshow('Capture', frame)
+
+            if cv2.waitKey(20) & 0xFF == ord('q'): break
 
             if i == 20: break
-            i+=1
-            time.sleep(0.25)
 
-
-        # Release camera object
         cap.release()
         cv2.destroyAllWindows()
         self.entry6.configure(state='normal')
         self.entry6.delete(0, "end")
-        self.entry6.insert(0, "Images/Face_customer/" + emp_id)
+        self.entry6.insert(0, path)
         self.entry6.configure(state='disabled')
+        # Release camera object
+        faceTrainning.faceTrain(path).trainning()
+
+
+
+
+
 
 
 # màn hình update khách hàng
@@ -621,7 +636,7 @@ class Update_Employee:
         self.button2.configure(background="#CF1E14")
         self.button2.configure(font="-family {Poppins SemiBold} -size 14")
         self.button2.configure(borderwidth="0")
-        self.button2.configure(text="""XÓA""")
+        self.button2.configure(text="""CLEAR""")
         self.button2.configure(command=self.clearr)
 
         self.checkButton = Checkbutton(e_update)
@@ -659,9 +674,11 @@ class Update_Employee:
                                 )
                                 cur.execute(update, [ename, econtact, eadd, eaddhar, epass, edes, eloyal, emp_id])
 
+
+
                                 db.commit()
                                 messagebox.showinfo("Success!!",
-                                                    "Khách hàng ID: {} đã cập nhật thành công.".format(emp_id),
+                                                    "Employee ID: {} successfully updated in database.".format(emp_id),
                                                     parent=e_update)
                                 vall.clear()
                                 page1.tree.delete(*page1.tree.get_children())
@@ -669,23 +686,23 @@ class Update_Employee:
                                 Customer.sel.clear()
                                 e_update.destroy()
                             else:
-                                messagebox.showerror("Oops!", "Chưa điền mật khẩu.", parent=e_update)
+                                messagebox.showerror("Oops!", "Please enter a password.", parent=e_update)
                         else:
-                            messagebox.showerror("Oops!", "Chưa điền địa chỉ.", parent=e_update)
+                            messagebox.showerror("Oops!", "Please enter address.", parent=e_update)
                     else:
-                        messagebox.showerror("Oops!", "Chưa điền mức giảm giá.", parent=e_update)
+                        messagebox.showerror("Oops!", "Please enter designation.", parent=e_update)
                 else:
-                    messagebox.showerror("Oops!", "Số căn cước chưa đúng.", parent=e_update)
+                    messagebox.showerror("Oops!", "Invalid Aadhar number.", parent=e_update)
             else:
-                messagebox.showerror("Oops!", "Số điện thoại chưa đúng.", parent=e_update)
+                messagebox.showerror("Oops!", "Invalid phone number.", parent=e_update)
         else:
-            messagebox.showerror("Oops!", "Chưa điền tên nhân viên.", parent=e_update)
+            messagebox.showerror("Oops!", "Please enter employee name.", parent=e_update)
+
+
 
     def takePhoto(self):
-
         # Initialize camera object
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        i =1
         while True:
             # Capture a frame from camera
             ret, frame = cap.read()
@@ -693,20 +710,50 @@ class Update_Employee:
                 break
             # Lật ngược chiều dọc
             flip_frame = cv2.flip(frame, 1)
-            cv2.imshow('Wait 5 second', flip_frame)
-            # Save the captured frame to file
-            path = "Images/Face_customer/" + vall[0]+"/"+vall[0]+"-"+str(i) + ".png"
-            cv2.imwrite(path, frame)
-            i+=1
-            if i == 20 : break
-            time.sleep(0.25)
+            cv2.imshow('Nhấn Q để chụp ảnh', flip_frame)
+            if cv2.waitKey(1) == ord('q'):
+                # Save the captured frame to file
+                path = "Images/Face_customer/" + vall[0] + ".png"
+                cv2.imwrite(path, frame)
+                self.entry6.configure(state='normal')
+                self.entry6.delete(0, "end")
+                self.entry6.insert(0, path)
+                self.entry6.configure(state='disabled')
+                break
         # Release camera object
         cap.release()
         cv2.destroyAllWindows()
-        self.entry6.configure(state='normal')
-        self.entry6.delete(0, "end")
-        self.entry6.insert(0, "Images/Face_customer/" + vall[0])
-        self.entry6.configure(state='disabled')
+
+
+
+# def takePhoto(self):
+
+#     # Initialize camera object
+#     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+#     i =1
+#     while True:
+#         # Capture a frame from camera
+#         ret, frame = cap.read()
+#         if not ret:
+#             break
+#         # Lật ngược chiều dọc
+#         flip_frame = cv2.flip(frame, 1)
+#         cv2.imshow('Wait 5 second', flip_frame)
+#         # Save the captured frame to file
+#         path = "Images/Face_customer/" + vall[0]+"/"+vall[0]+"-"+str(i) + ".png"
+#         cv2.imwrite(path, frame)
+#         i+=1
+#         if i == 20 : break
+#         time.sleep(0.25)
+#     # Release camera object
+#     cap.release()
+#     cv2.destroyAllWindows()
+#     self.entry6.configure(state='normal')
+#     self.entry6.delete(0, "end")
+#     self.entry6.insert(0, "Images/Face_customer/" + vall[0])
+#     self.entry6.configure(state='disabled')
+
+
 
     def clearr(self):
         self.entry1.delete(0, END)
@@ -716,12 +763,14 @@ class Update_Employee:
         self.entry5.delete(0, END)
         self.entry6.delete(0, END)
 
+
     def testint(self, val):
         if val.isdigit():
             return True
         elif val == "":
             return True
         return False
+
 
     def testchar(self, val):
         if val.isalpha():
@@ -747,7 +796,6 @@ def random_emp_id(stringLength):
     Digits = string.digits
     strr = ''.join(random.choice(Digits) for i in range(stringLength - 3))
     return ('CTM' + strr)
-
 
 
 page1 = Customer(root)

@@ -27,26 +27,29 @@ cust_new_bill = StringVar()
 cust_search_bill = StringVar()
 bill_date = StringVar()
 
-
 with sqlite3.connect("./Database/database.db") as db:
     cur = db.cursor()
 
+
 def random_bill_number(stringLength):
     lettersAndDigits = string.ascii_letters.upper() + string.digits
-    strr=''.join(random.choice(lettersAndDigits) for i in range(stringLength-2))
-    return ('BB'+strr)
+    strr = ''.join(random.choice(lettersAndDigits) for i in range(stringLength - 2))
+    return ('BB' + strr)
+
 
 def logout():
-    sure = messagebox.askyesno("Logout", "Bạn có chắc muốn thoát?", parent=bill_root)
+    sure = messagebox.askyesno("Logout", "Are you sure you want to logout?", parent=bill_root)
     if sure == True:
         bill_root.destroy()
         os.system("python ./Employee/Login.py")
+
 
 class Item:
     def __init__(self, name, price, qty):
         self.product_name = name
         self.price = price
         self.qty = qty
+
 
 class Cart:
     def __init__(self):
@@ -62,29 +65,29 @@ class Cart:
     def remove_items(self):
         self.items.clear()
 
-    def total(self,discount):
+    def total(self, discount):
         total = 0.0
         for i in self.items:
             total += i.price * i.qty
         return total - total * discount / 100
 
     def isEmpty(self):
-        if len(self.items)==0:
+        if len(self.items) == 0:
             return True
-        
+
     def allCart(self):
         for i in self.items:
             if (i.product_name in self.dictionary):
                 self.dictionary[i.product_name] += i.qty
             else:
-                self.dictionary.update({i.product_name:i.qty})
-    
+                self.dictionary.update({i.product_name: i.qty})
+
 
 def exitt():
-    sure = messagebox.askyesno("Exit","Bạn có chắc muốn thoát?", parent=bill_root)
+    sure = messagebox.askyesno("Exit", "Are you sure you want to exit?", parent=bill_root)
     if sure == True:
         bill_root.destroy()
-        
+
         # bill_root.destroy()
 
 
@@ -251,15 +254,14 @@ class bill_window:
         text_font = ("Poppins", "8")
         self.combo1 = ttk.Combobox(bill_root)
         self.combo1.place(relx=0.035, rely=0.408, width=477, height=26)
-    
+
         find_category = "SELECT product_cat FROM raw_inventory"
         cur.execute(find_category)
         result1 = cur.fetchall()
         cat = []
         for i in range(len(result1)):
-            if(result1[i][0] not in cat):
+            if (result1[i][0] not in cat):
                 cat.append(result1[i][0])
-
 
         self.combo1.configure(values=cat)
         self.combo1.configure(state="readonly")
@@ -267,13 +269,11 @@ class bill_window:
         self.combo1.option_add("*TCombobox*Listbox.font", text_font)
         self.combo1.option_add("*TCombobox*Listbox.selectBackground", "#D2463E")
 
-
         self.combo2 = ttk.Combobox(bill_root)
         self.combo2.place(relx=0.035, rely=0.479, width=477, height=26)
         self.combo2.configure(font="-family {Poppins} -size 8")
-        self.combo2.option_add("*TCombobox*Listbox.font", text_font) 
+        self.combo2.option_add("*TCombobox*Listbox.font", text_font)
         self.combo2.configure(state="disabled")
-
 
         self.combo3 = ttk.Combobox(bill_root)
         self.combo3.place(relx=0.035, rely=0.551, width=477, height=26)
@@ -294,7 +294,7 @@ class bill_window:
         self.Scrolledtext1.configure(state="disabled")
 
         self.combo1.bind("<<ComboboxSelected>>", self.get_category)
-        
+
     def get_category(self, Event):
         self.combo2.configure(state="readonly")
         self.combo2.set('')
@@ -304,9 +304,9 @@ class bill_window:
         result2 = cur.fetchall()
         subcat = []
         for j in range(len(result2)):
-            if(result2[j][0] not in subcat):
+            if (result2[j][0] not in subcat):
                 subcat.append(result2[j][0])
-        
+
         self.combo2.configure(values=subcat)
         self.combo2.bind("<<ComboboxSelected>>", self.get_subcat)
         self.combo3.configure(state="disabled")
@@ -339,59 +339,24 @@ class bill_window:
         self.qty_label.configure(text="In Stock: {}".format(results[0]))
         self.qty_label.configure(background="#ffffff")
         self.qty_label.configure(foreground="#333333")
-    
+
     cart = Cart()
+
     def add_to_cart(self):
         self.Scrolledtext1.configure(state="normal")
         strr = self.Scrolledtext1.get('1.0', END)
-        if strr.find('Total')==-1:
+        if strr.find('Total') == -1:
             product_name = self.combo3.get()
-            if(product_name!=""):
+            if (product_name != ""):
                 product_qty = self.entry4.get()
-                find_mrp = "SELECT cost_price, stock FROM raw_inventory WHERE product_name = ?"
+                find_mrp = "SELECT mrp, stock FROM raw_inventory WHERE product_name = ?"
                 cur.execute(find_mrp, [product_name])
                 results = cur.fetchall()
                 stock = int(results[0][1])
-                cost_price = float(results[0][0])
-                if product_qty.isdigit()==True:
-                    if (stock-int(product_qty))>=0:
-                        sp = cost_price*int(product_qty)
-                        item = Item(product_name, cost_price, int(product_qty))
-                        self.cart.add_item(item)
-                        self.Scrolledtext1.configure(state="normal")
-                        bill_text = "{}\t\t\t\t\t\t{}\t\t\t\t\t   {}\n".format(product_name, product_qty, sp)
-                        self.Scrolledtext1.insert('insert', bill_text)
-                        self.Scrolledtext1.configure(state="disabled")
-                    else:
-                        messagebox.showerror("Oops!", "Hết hàng.", parent=bill_root)
-                else:
-                    messagebox.showerror("Oops!", "Chưa điền số lượng.", parent=bill_root)
-            else:
-                messagebox.showerror("Oops!", "Chưa chọn sản phẩm.", parent=bill_root)
-        else:
-            self.Scrolledtext1.delete('1.0', END)
-            new_li = []
-            li = strr.split("\n")
-            for i in range(len(li)):
-                if len(li[i])!=0:
-                    if li[i].find('Total')==-1:
-                        new_li.append(li[i])
-                    else:
-                        break
-            for j in range(len(new_li)-1):
-                self.Scrolledtext1.insert('insert', new_li[j])
-                self.Scrolledtext1.insert('insert','\n')
-            product_name = self.combo3.get()
-            if(product_name!=""):
-                product_qty = self.entry4.get()
-                find_mrp = "SELECT mrp, stock, product_id FROM raw_inventory WHERE product_name = ?"
-                cur.execute(find_mrp, [product_name])
-                results = cur.fetchall()
-                stock = results[0][1]
-                mrp = results[0][0]
-                if product_qty.isdigit()==True:
-                    if (stock-int(product_qty))>=0:
-                        sp = results[0][0]*int(product_qty)
+                mrp = float(results[0][0])
+                if product_qty.isdigit() == True:
+                    if (stock - int(product_qty)) >= 0:
+                        sp = mrp * int(product_qty)
                         item = Item(product_name, mrp, int(product_qty))
                         self.cart.add_item(item)
                         self.Scrolledtext1.configure(state="normal")
@@ -399,54 +364,90 @@ class bill_window:
                         self.Scrolledtext1.insert('insert', bill_text)
                         self.Scrolledtext1.configure(state="disabled")
                     else:
-                        messagebox.showerror("Oops!", "Hết hàng.", parent=bill_root)
+                        messagebox.showerror("Oops!", "Out of stock. Check quantity.", parent=bill_root)
                 else:
-                    messagebox.showerror("Oops!", "Chưa điền số lượng.", parent=bill_root)
+                    messagebox.showerror("Oops!", "Invalid quantity.", parent=bill_root)
             else:
-                messagebox.showerror("Oops!", "Chưa chọn số lượng.", parent=bill_root)
-    
+                messagebox.showerror("Oops!", "Choose a product.", parent=bill_root)
+        else:
+            self.Scrolledtext1.delete('1.0', END)
+            new_li = []
+            li = strr.split("\n")
+            for i in range(len(li)):
+                if len(li[i]) != 0:
+                    if li[i].find('Total') == -1:
+                        new_li.append(li[i])
+                    else:
+                        break
+            for j in range(len(new_li) - 1):
+                self.Scrolledtext1.insert('insert', new_li[j])
+                self.Scrolledtext1.insert('insert', '\n')
+            product_name = self.combo3.get()
+            if (product_name != ""):
+                product_qty = self.entry4.get()
+                find_mrp = "SELECT mrp, stock, product_id FROM raw_inventory WHERE product_name = ?"
+                cur.execute(find_mrp, [product_name])
+                results = cur.fetchall()
+                stock = results[0][1]
+                mrp = results[0][0]
+                if product_qty.isdigit() == True:
+                    if (stock - int(product_qty)) >= 0:
+                        sp = results[0][0] * int(product_qty)
+                        item = Item(product_name, mrp, int(product_qty))
+                        self.cart.add_item(item)
+                        self.Scrolledtext1.configure(state="normal")
+                        bill_text = "{}\t\t\t\t\t\t{}\t\t\t\t\t   {}\n".format(product_name, product_qty, sp)
+                        self.Scrolledtext1.insert('insert', bill_text)
+                        self.Scrolledtext1.configure(state="disabled")
+                    else:
+                        messagebox.showerror("Oops!", "Out of stock. Check quantity.", parent=bill_root)
+                else:
+                    messagebox.showerror("Oops!", "Invalid quantity.", parent=bill_root)
+            else:
+                messagebox.showerror("Oops!", "Choose a product.", parent=bill_root)
+
     def remove_product(self):
-        if(self.cart.isEmpty()!=True):
+        if (self.cart.isEmpty() != True):
             self.Scrolledtext1.configure(state="normal")
             strr = self.Scrolledtext1.get('1.0', END)
-            if strr.find('Total')==-1:
+            if strr.find('Total') == -1:
                 try:
                     self.cart.remove_item()
                 except IndexError:
-                    messagebox.showerror("Oops!", "Chưa có sản phẩm", parent=bill_root)
+                    messagebox.showerror("Oops!", "Cart is empty", parent=bill_root)
                 else:
                     self.Scrolledtext1.configure(state="normal")
                     get_all_bill = (self.Scrolledtext1.get('1.0', END).split("\n"))
-                    new_string = get_all_bill[:len(get_all_bill)-3]
+                    new_string = get_all_bill[:len(get_all_bill) - 3]
                     self.Scrolledtext1.delete('1.0', END)
                     for i in range(len(new_string)):
                         self.Scrolledtext1.insert('insert', new_string[i])
-                        self.Scrolledtext1.insert('insert','\n')
-                    
+                        self.Scrolledtext1.insert('insert', '\n')
+
                     self.Scrolledtext1.configure(state="disabled")
             else:
                 try:
                     self.cart.remove_item()
                 except IndexError:
-                    messagebox.showerror("Oops!", "Chưa có sản phẩm", parent=bill_root)
+                    messagebox.showerror("Oops!", "Cart is empty", parent=bill_root)
                 else:
                     self.Scrolledtext1.delete('1.0', END)
                     new_li = []
                     li = strr.split("\n")
                     for i in range(len(li)):
-                        if len(li[i])!=0:
-                            if li[i].find('Total')==-1:
+                        if len(li[i]) != 0:
+                            if li[i].find('Total') == -1:
                                 new_li.append(li[i])
                             else:
                                 break
                     new_li.pop()
-                    for j in range(len(new_li)-1):
+                    for j in range(len(new_li) - 1):
                         self.Scrolledtext1.insert('insert', new_li[j])
-                        self.Scrolledtext1.insert('insert','\n')
+                        self.Scrolledtext1.insert('insert', '\n')
                     self.Scrolledtext1.configure(state="disabled")
 
         else:
-            messagebox.showerror("Oops!", "Chưa có sản phẩm.", parent=bill_root)
+            messagebox.showerror("Oops!", "Add a product.", parent=bill_root)
 
     def wel_bill(self):
         self.name_message = Text(bill_root)
@@ -472,20 +473,20 @@ class bill_window:
         self.bill_date_message.configure(font="-family {Podkova} -size 10")
         self.bill_date_message.configure(borderwidth=0)
         self.bill_date_message.configure(background="#ffffff")
-    
+
     def total_bill(self, discount):
         if self.cart.isEmpty():
-            messagebox.showerror("Oops!", "Chưa có sản phẩm.", parent=bill_root)
+            messagebox.showerror("Oops!", "Add a product.", parent=bill_root)
         else:
             self.Scrolledtext1.configure(state="normal")
             strr = self.Scrolledtext1.get('1.0', END)
-            if strr.find('Total')==-1:
+            if strr.find('Total') == -1:
                 self.Scrolledtext1.configure(state="normal")
-                divider = "\n\n\n"+("─"*61)
+                divider = "\n\n\n" + ("─" * 61)
                 self.Scrolledtext1.insert('insert', divider)
                 total = "\nTotal\t\t\t\t\t\t\t\t\t\t\tRs. {}".format(self.cart.total(discount))
                 self.Scrolledtext1.insert('insert', total)
-                divider2 = "\n"+("─"*61)
+                divider2 = "\n" + ("─" * 61)
                 self.Scrolledtext1.insert('insert', divider2)
                 self.Scrolledtext1.configure(state="disabled")
             else:
@@ -497,29 +498,29 @@ class bill_window:
         y = int(bill_root.winfo_screenheight() / 2 - 500 / 2)
         stringSet = "120x120" + "+" + str(x) + "+" + str(y)
         windowChooseTypeOfCus.geometry(stringSet)
-        windowChooseTypeOfCus.resizable(FALSE,FALSE)
+        windowChooseTypeOfCus.resizable(FALSE, FALSE)
         self.discount = 0
+
         def openCamera():
             import faceRecog
             with sqlite3.connect("./Database/database.db") as db:
                 curCus = db.cursor()
-            
-            self.entry1.delete(0,END)
-            idCus = faceRecog.FaceRecognition().run_recognition().split(".")[0]
+
+            self.entry1.delete(0, END)
+            idCus = faceRecog.faceRecognition()
             curCus.execute(f"SELECT isLoyal from Customer WHERE ctm_id='{idCus}'")
-            listCusIDImg =curCus.fetchall()[0]
+            listCusIDImg = curCus.fetchall()[0]
             if idCus == "Unknown":
-                messagebox.showinfo("Info","Not is loyal employee")
-                self.entry1.insert(0,"")
+                messagebox.showinfo("Info", "Not is loyal employee")
+                self.entry1.insert(0, "")
             elif (listCusIDImg[0] == 'TRUE'):
                 curCus.execute(f"SELECT name from Customer WHERE ctm_id='{idCus}'")
                 name = curCus.fetchall()[0]
                 curCus.execute(f"SELECT discount from Customer WHERE ctm_id='{idCus}'")
                 self.discount = int(curCus.fetchall()[0][0])
-                self.entry1.insert(0,name[0])
-
+                self.entry1.insert(0, name[0])
             windowChooseTypeOfCus.destroy()
-            
+
         button1 = Button(windowChooseTypeOfCus)
         button1.place(relx=0, rely=0.116, width=146, height=90)
         button1.configure(relief="flat")
@@ -531,58 +532,57 @@ class bill_window:
         button1.configure(borderwidth="0")
         button1.configure(text="Loyal Customer")
         button1.configure(command=openCamera)
-        
+
         windowChooseTypeOfCus.wait_window()
-        
-    
+
     state = 1
+
     # discount
     def gen_bill(self):
         if cust_name.get() == "":
             self.chooseTypeOfCus()
-        
+
         if self.state == 1:
             strr = self.Scrolledtext1.get('1.0', END)
             self.wel_bill()
-            if(cust_name.get()==""):
-                messagebox.showerror("Oops!", "Chưa điền tên khách hàng.", parent=bill_root)
+            if (cust_name.get() == ""):
+                messagebox.showerror("Oops!", "Please enter a name.", parent=bill_root)
             # elif(cust_num.get()==""):
             #     messagebox.showerror("Oops!", "Please enter a number.", parent=bill_root)
             # elif valid_phone(cust_num.get())==False:
             #     messagebox.showerror("Oops!", "Please enter a valid number.", parent=bill_root)
-            elif(self.cart.isEmpty()):
+            elif (self.cart.isEmpty()):
                 messagebox.showerror("Oops!", "Cart is empty.", parent=bill_root)
-            else: 
-                if strr.find('Total')==-1:
+            else:
+                if strr.find('Total') == -1:
                     self.total_bill(self.discount)
                     self.gen_bill()
                 else:
                     self.name_message.insert(END, cust_name.get())
                     self.name_message.configure(state="disabled")
-            
+
                     self.num_message.insert(END, cust_num.get())
                     self.num_message.configure(state="disabled")
-            
+
                     cust_new_bill.set(random_bill_number(8))
 
                     self.bill_message.insert(END, cust_new_bill.get())
                     self.bill_message.configure(state="disabled")
-                
+
                     bill_date.set(str(date.today()))
 
                     self.bill_date_message.insert(END, bill_date.get())
                     self.bill_date_message.configure(state="disabled")
 
-                    
-
-                    with sqlite3.connect("./Database/database.db") as db:
+                    with sqlite3.connect("./Database/store.db") as db:
                         cur = db.cursor()
                     insert = (
                         "INSERT INTO bill(bill_no, date, customer_name, customer_no, bill_details) VALUES(?,?,?,?,?)"
                     )
-                    cur.execute(insert, [cust_new_bill.get(), bill_date.get(), cust_name.get(), cust_num.get(), self.Scrolledtext1.get('1.0', END)])
+                    cur.execute(insert, [cust_new_bill.get(), bill_date.get(), cust_name.get(), cust_num.get(),
+                                         self.Scrolledtext1.get('1.0', END)])
                     db.commit()
-                    #print(self.cart.items)
+                    # print(self.cart.items)
                     print(self.cart.allCart())
                     for name, qty in self.cart.dictionary.items():
                         update_qty = "UPDATE raw_inventory SET stock = stock - ? WHERE product_name = ?"
@@ -594,7 +594,7 @@ class bill_window:
                     self.state = 0
         else:
             return
-                    
+
     def clear_bill(self):
         self.wel_bill()
         self.entry1.configure(state="normal")
@@ -635,7 +635,7 @@ class bill_window:
             self.qty_label.configure(foreground="#ffffff")
         except AttributeError:
             pass
-             
+
     def search_bill(self):
         find_bill = "SELECT * FROM bill WHERE bill_no = ?"
         cur.execute(find_bill, [cust_search_bill.get().rstrip()])
@@ -645,10 +645,10 @@ class bill_window:
             self.wel_bill()
             self.name_message.insert(END, results[0][2])
             self.name_message.configure(state="disabled")
-    
+
             self.num_message.insert(END, results[0][3])
             self.num_message.configure(state="disabled")
-    
+
             self.bill_message.insert(END, results[0][0])
             self.bill_message.configure(state="disabled")
 
@@ -665,9 +665,9 @@ class bill_window:
             self.state = 0
 
         else:
-            messagebox.showerror("Error!!", "Không tìm thấy hóa đơn này.", parent=bill_root)
+            messagebox.showerror("Error!!", "Bill not found.", parent=bill_root)
             self.entry3.delete(0, END)
-            
+
     def time(self):
         string = strftime("%H:%M:%S %p")
         self.clock.config(text=string)
